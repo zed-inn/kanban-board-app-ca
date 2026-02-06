@@ -1,0 +1,25 @@
+{
+  "name": "kanban",
+  "version": "1.0.0",
+  "description": "kanban board application component",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "npx tsc",
+    "start": "npm run dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zed-inn/kanban-board-app-ca.git"
+  },
+  "author": "zed",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zed-inn/kanban-board-app-ca/issues"
+  },
+  "homepage": "https://github.com/zed-inn/kanban-board-app-ca#readme",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
