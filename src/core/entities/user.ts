@@ -2,11 +2,9 @@ export class User {
   public id: string;
 
   constructor(params: { id: string }) {
-    if (typeof params.id !== "string")
-      throw new Error("Valid id is required for a user.");
+    if (typeof params.id !== "string") throw new Error("Invalid user id.");
     params.id = params.id.trim();
-    if (params.id.length < 1)
-      throw new Error("User Id cannot be an empty string.");
+    if (params.id.length < 1) throw new Error("User id cannot be empty.");
 
     this.id = params.id;
   }
