@@ -1,13 +1,8 @@
 export class BoardMembership {
-  public boardId: string;
-  public memberId: string;
-  public status: "ACTIVE" | "TERMINATED";
+  private boardId: string;
+  private memberId: string;
 
-  constructor(params: {
-    boardId: string;
-    memberId: string;
-    status: "ACTIVE" | "TERMINATED";
-  }) {
+  constructor(params: { boardId: string; memberId: string }) {
     if (typeof params.boardId !== "string")
       throw new Error("Invalid board id.");
     params.boardId = params.boardId.trim();
@@ -22,33 +17,7 @@ export class BoardMembership {
       throw new Error("Member id cannot be empty.");
 
     this.memberId = params.memberId;
-
-    if (!["ACTIVE", "TERMINATED"].includes(params.status))
-      throw new Error("Invalid membership status.");
-
-    this.status = params.status;
   }
 
-  terminateMembership = () => {
-    if (this.status === "TERMINATED")
-      throw new Error("Terminated membership cannot be terminated further.");
-
-    this.status = "TERMINATED";
-  };
-
-  addMember = (userId: string) => {
-    return new BoardMembership({
-      boardId: this.boardId,
-      memberId: userId,
-      status: "ACTIVE",
-    });
-  };
-
-  removeMember = (userId: string) => {
-    return new BoardMembership({
-      boardId: this.boardId,
-      memberId: userId,
-      status: "TERMINATED",
-    });
-  };
+  getAttrbs = () => ({ boardId: this.boardId, memberId: this.memberId });
 }

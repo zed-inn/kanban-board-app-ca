@@ -1,7 +1,7 @@
 export class Board {
-  public id: string;
-  public name: string;
-  public ownerId: string;
+  private id: string;
+  private name: string;
+  private ownerId: string;
 
   constructor(params: { id: string; name: string; ownerId: string }) {
     if (typeof params.id !== "string") throw new Error("Invalid board id.");
@@ -23,6 +23,8 @@ export class Board {
 
     this.ownerId = params.ownerId;
   }
+
+  getAttrbs = () => ({ id: this.id, name: this.name, ownerId: this.ownerId });
 
   updateName = (name: string) => {
     if (typeof name !== "string") throw new Error("Invalid board name.");

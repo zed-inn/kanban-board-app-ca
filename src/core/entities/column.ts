@@ -1,8 +1,8 @@
 export class Column {
-  public id: string;
-  public name: string;
-  public position: number;
-  public boardId: string;
+  private id: string;
+  private name: string;
+  private position: number;
+  private boardId: string;
 
   constructor(params: {
     id: string;
@@ -23,7 +23,7 @@ export class Column {
 
     this.name = params.name;
 
-    if (typeof params.position !== "number")
+    if (typeof params.position !== "number" || isNaN(params.position))
       throw new Error("Invalid column position.");
 
     this.position = params.position;
@@ -36,16 +36,23 @@ export class Column {
     this.boardId = params.boardId;
   }
 
+  getAttrbs = () => ({
+    id: this.id,
+    name: this.name,
+    position: this.position,
+    boardId: this.boardId,
+  });
+
   updateName = (name: string) => {
     if (typeof name !== "string") throw new Error("Invalid column name.");
     name = name.trim();
     if (name.length < 1) throw new Error("Column name cannot be empty.");
 
-    this.name;
+    this.name = name;
   };
 
   updatePosition = (position: number) => {
-    if (typeof position !== "number")
+    if (typeof position !== "number" || isNaN(position))
       throw new Error("Invalid column position.");
 
     this.position = position;

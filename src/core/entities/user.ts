@@ -1,5 +1,5 @@
 export class User {
-  public id: string;
+  private id: string;
 
   constructor(params: { id: string }) {
     if (typeof params.id !== "string") throw new Error("Invalid user id.");
@@ -8,4 +8,6 @@ export class User {
 
     this.id = params.id;
   }
+
+  getAttrbs = () => ({ id: this.id });
 }

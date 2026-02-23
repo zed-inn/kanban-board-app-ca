@@ -1,9 +1,9 @@
 export class Card {
-  public id: string;
-  public title: string;
-  public content: string | null;
-  public position: number;
-  public columnId: string;
+  private id: string;
+  private title: string;
+  private content: string | null;
+  private position: number;
+  private columnId: string;
 
   constructor(params: {
     id: string;
@@ -43,6 +43,14 @@ export class Card {
 
     this.columnId = params.columnId;
   }
+
+  getAttrbs = () => ({
+    id: this.id,
+    title: this.title,
+    content: this.content,
+    postition: this.position,
+    columnId: this.columnId,
+  });
 
   updateBody = (params: { title?: string; content?: string | null }) => {
     if (params.title !== undefined) {
