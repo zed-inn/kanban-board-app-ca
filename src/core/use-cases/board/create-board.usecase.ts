@@ -1,8 +1,8 @@
-import { Board } from "../entities/board";
-import { BoardMembership } from "../entities/board_membership";
-import type { BoardRepository } from "../interfaces/board-repository";
-import type { MemberRepository } from "../interfaces/member-repository";
-import type { UnitOfWork } from "../interfaces/unit-of-work";
+import { Board } from "../../entities/board";
+import { BoardMembership } from "../../entities/board_membership";
+import type { BoardRepository } from "../../interfaces/board-repository.interface";
+import type { MemberRepository } from "../../interfaces/member-repository.interface";
+import type { UnitOfWork } from "../../interfaces/unit-of-work.interface";
 
 export class CreateBoard {
   constructor(

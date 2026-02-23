@@ -1,6 +1,6 @@
-import type { BoardRepository } from "../interfaces/board-repository";
-import type { MemberRepository } from "../interfaces/member-repository";
-import type { UnitOfWork } from "../interfaces/unit-of-work";
+import type { BoardRepository } from "../../interfaces/board-repository.interface";
+import type { MemberRepository } from "../../interfaces/member-repository.interface";
+import type { UnitOfWork } from "../../interfaces/unit-of-work.interface";
 
 export class DeleteBoard {
   constructor(
