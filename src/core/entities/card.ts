@@ -44,15 +44,17 @@ export class Card {
     this.columnId = params.columnId;
   }
 
-  getAttrbs = () => ({
-    id: this.id,
-    title: this.title,
-    content: this.content,
-    postition: this.position,
-    columnId: this.columnId,
-  });
+  public get attrbs() {
+    return {
+      id: this.id,
+      title: this.title,
+      content: this.content,
+      postition: this.position,
+      columnId: this.columnId,
+    };
+  }
 
-  updateBody = (params: { title?: string; content?: string | null }) => {
+  public updateBody = (params: { title?: string; content?: string | null }) => {
     if (params.title !== undefined) {
       if (typeof params.title !== "string")
         throw new Error("Invalid card title.");
@@ -71,12 +73,12 @@ export class Card {
     }
   };
 
-  updatePosition = (position: number) => {
+  public updatePosition = (position: number) => {
     if (typeof position !== "number") throw new Error("Invalid card position.");
     this.position = position;
   };
 
-  updateColumn = (columnId: string) => {
+  public updateColumn = (columnId: string) => {
     if (typeof columnId !== "string") throw new Error("Invalid column id.");
     columnId = columnId.trim();
     if (columnId.length < 1) throw new Error("Column Id cannot be empty.");

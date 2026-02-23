@@ -36,14 +36,16 @@ export class Column {
     this.boardId = params.boardId;
   }
 
-  getAttrbs = () => ({
-    id: this.id,
-    name: this.name,
-    position: this.position,
-    boardId: this.boardId,
-  });
+  public get attrbs() {
+    return {
+      id: this.id,
+      name: this.name,
+      position: this.position,
+      boardId: this.boardId,
+    };
+  }
 
-  updateName = (name: string) => {
+  public updateName = (name: string) => {
     if (typeof name !== "string") throw new Error("Invalid column name.");
     name = name.trim();
     if (name.length < 1) throw new Error("Column name cannot be empty.");
@@ -51,7 +53,7 @@ export class Column {
     this.name = name;
   };
 
-  updatePosition = (position: number) => {
+  public updatePosition = (position: number) => {
     if (typeof position !== "number" || isNaN(position))
       throw new Error("Invalid column position.");
 

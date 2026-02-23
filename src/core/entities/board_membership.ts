@@ -19,5 +19,7 @@ export class BoardMembership {
     this.memberId = params.memberId;
   }
 
-  getAttrbs = () => ({ boardId: this.boardId, memberId: this.memberId });
+  public get attrbs() {
+    return { boardId: this.boardId, memberId: this.memberId };
+  }
 }

@@ -24,9 +24,11 @@ export class Board {
     this.ownerId = params.ownerId;
   }
 
-  getAttrbs = () => ({ id: this.id, name: this.name, ownerId: this.ownerId });
+  public get attrbs() {
+    return { id: this.id, name: this.name, ownerId: this.ownerId };
+  }
 
-  updateName = (name: string) => {
+  public updateName = (name: string) => {
     if (typeof name !== "string") throw new Error("Invalid board name.");
     name = name.trim();
     if (name.length < 1) throw new Error("Board name cannot be empty.");
@@ -34,7 +36,7 @@ export class Board {
     this.name = name;
   };
 
-  transferOwnershipTo = (ownerId: string) => {
+  public transferOwnershipTo = (ownerId: string) => {
     if (typeof ownerId !== "string") throw new Error("Invalid owner id.");
     ownerId = ownerId.trim();
     if (ownerId.length < 1) throw new Error("Owner id cannot be empty.");

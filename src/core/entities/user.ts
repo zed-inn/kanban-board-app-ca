@@ -9,5 +9,7 @@ export class User {
     this.id = params.id;
   }
 
-  getAttrbs = () => ({ id: this.id });
+  public get attrbs() {
+    return { id: this.id };
+  }
 }
