@@ -9,14 +9,12 @@ export class AddMember {
     const isMember = await this.memberRepo.membershipExists(member);
 
     if (!isMember)
-      throw new Error("Non-member of a board cannot add members in a board.");
+      throw new Error("Non-member of a board cannot add members to a board.");
 
     const newMember = new BoardMembership({ boardId, memberId: newMemberId });
     const isNotNewMember = await this.memberRepo.membershipExists(newMember);
+    const isNewMember = !isNotNewMember;
 
-    if (isNotNewMember)
-      throw new Error("Members of a board cannot join as 'NEW' members again.");
-
-    await this.memberRepo.save(newMember);
+    if (isNewMember) await this.memberRepo.save(newMember);
   };
 }

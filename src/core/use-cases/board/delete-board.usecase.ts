@@ -13,7 +13,9 @@ export class DeleteBoard {
     return await this.uow.withTransaction(async () => {
       const board = await this.boardRepo.getById(boardId);
       if (board.attrbs.ownerId !== userId)
-        throw new Error("Invalid access by non-owner.");
+        throw new Error(
+          "Board cannot be deleted without ownership priviledges.",
+        );
 
       await this.boardRepo.remove(board);
       await this.memberRepo.removeMembersOfBoard(board);

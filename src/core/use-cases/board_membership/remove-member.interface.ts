@@ -9,7 +9,7 @@ export class RemoveMember {
     const isMember = await this.memberRepo.membershipExists(member);
 
     if (!isMember)
-      throw new Error("Non-member cannot act as members of a board and leave.");
+      throw new Error("Board cannot be leaved without membership priviledges.");
 
     await this.memberRepo.remove(member);
   };
