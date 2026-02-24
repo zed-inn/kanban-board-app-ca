@@ -6,13 +6,13 @@ export class AddMember {
 
   execute = async (boardId: string, memberId: string, newMemberId: string) => {
     const member = new BoardMembership({ boardId, memberId });
-    const isMember = await this.memberRepo.membershipExists(member);
+    const isMember = await this.memberRepo.exists(member);
 
     if (!isMember)
       throw new Error("Non-member of a board cannot add members to a board.");
 
     const newMember = new BoardMembership({ boardId, memberId: newMemberId });
-    const isNotNewMember = await this.memberRepo.membershipExists(newMember);
+    const isNotNewMember = await this.memberRepo.exists(newMember);
     const isNewMember = !isNotNewMember;
 
     if (isNewMember) await this.memberRepo.save(newMember);

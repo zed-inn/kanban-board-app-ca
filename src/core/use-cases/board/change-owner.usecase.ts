@@ -18,7 +18,7 @@ export class ChangeOwner {
       );
 
     const member = new BoardMembership({ boardId, memberId });
-    const isMember = await this.memberRepo.membershipExists(member);
+    const isMember = await this.memberRepo.exists(member);
 
     if (!isMember)
       throw new Error("Only a member of the board can replace the owner.");

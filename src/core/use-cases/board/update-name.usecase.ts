@@ -10,7 +10,7 @@ export class UpdateBoardName {
 
   execute = async (boardId: string, userId: string, name: string) => {
     const membership = new BoardMembership({ boardId, memberId: userId });
-    const isMember = await this.memberRepo.membershipExists(membership);
+    const isMember = await this.memberRepo.exists(membership);
 
     if (!isMember)
       throw new Error("Non-member of board cannot update name of the board.");

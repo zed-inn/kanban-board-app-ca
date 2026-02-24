@@ -18,7 +18,7 @@ export class DeleteBoard {
         );
 
       await this.boardRepo.remove(board);
-      await this.memberRepo.removeMembersOfBoard(board);
+      await this.memberRepo.removeAllMembersOfBoard(board);
     });
   };
 }

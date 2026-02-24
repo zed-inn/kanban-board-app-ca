@@ -6,7 +6,7 @@ export class RemoveMember {
 
   execute = async (boardId: string, memberId: string) => {
     const member = new BoardMembership({ boardId, memberId });
-    const isMember = await this.memberRepo.membershipExists(member);
+    const isMember = await this.memberRepo.exists(member);
 
     if (!isMember)
       throw new Error("Board cannot be leaved without membership priviledges.");
