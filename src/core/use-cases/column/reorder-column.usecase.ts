@@ -9,7 +9,7 @@ export class ReorderColumn {
     private columnRepo: ColumnRepository,
   ) {}
 
-  belongsToBoard = (column: Column, boardId: string) =>
+  private belongsToBoard = (column: Column, boardId: string) =>
     column.attrbs.boardId === boardId;
 
   execute = async (

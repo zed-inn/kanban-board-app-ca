@@ -9,7 +9,7 @@ export class RemoveColumn {
     private columnRepo: ColumnRepository,
   ) {}
 
-  belongsToBoard = (column: Column, boardId: string) =>
+  private belongsToBoard = (column: Column, boardId: string) =>
     column.attrbs.boardId === boardId;
 
   execute = async (columnId: string, boardId: string, userId: string) => {
