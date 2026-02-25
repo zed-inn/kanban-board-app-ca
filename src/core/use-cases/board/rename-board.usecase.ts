@@ -1,6 +1,6 @@
 import { BoardMembership } from "../../entities/board_membership";
-import type { BoardRepository } from "../../interfaces/board-repository.interface";
-import type { MemberRepository } from "../../interfaces/member-repository.interface";
+import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
+import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class UpdateBoardName {
   constructor(

@@ -1,4 +1,4 @@
-import type { Card } from "../entities/card";
+import type { Card } from "../../entities/card";
 
 export interface CardRepository {
   save(card: Card): Promise<void>;

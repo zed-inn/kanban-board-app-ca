@@ -1,4 +1,4 @@
-import type { Board } from "../entities/board";
+import type { Board } from "../../entities/board";
 
 export interface BoardRepository {
   getById(id: string): Promise<Board>;

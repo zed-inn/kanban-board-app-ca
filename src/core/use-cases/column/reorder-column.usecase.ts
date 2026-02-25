@@ -1,7 +1,7 @@
 import { BoardMembership } from "../../entities/board_membership";
 import type { Column } from "../../entities/column";
-import type { ColumnRepository } from "../../interfaces/column-repository.interface";
-import type { MemberRepository } from "../../interfaces/member-repository.interface";
+import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
+import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class ReorderColumn {
   constructor(

@@ -1,5 +1,5 @@
-import type { Board } from "../entities/board";
-import type { BoardMembership } from "../entities/board_membership";
+import type { Board } from "../../entities/board";
+import type { BoardMembership } from "../../entities/board_membership";
 
 export interface MemberRepository {
   save(membership: BoardMembership): Promise<void>;

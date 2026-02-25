@@ -1,9 +1,9 @@
 import { BoardMembership } from "../../entities/board_membership";
 import type { Card } from "../../entities/card";
 import type { Column } from "../../entities/column";
-import type { CardRepository } from "../../interfaces/card-repository.interface";
-import type { ColumnRepository } from "../../interfaces/column-repository.interface";
-import type { MemberRepository } from "../../interfaces/member-repository.interface";
+import type { CardRepository } from "../../interfaces/repo/card-repository.interface";
+import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
+import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class RemoveCard {
   constructor(
