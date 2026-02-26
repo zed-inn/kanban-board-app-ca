@@ -17,10 +17,12 @@ export class ReorderColumn {
   ) => {
     await this.memberPolicy.ensureMember(userId, boardId);
 
-    const column = await this.columnRepo.getById(columnId);
-    await this.columnPolicy.ensureColumnInBoard(column.id, boardId);
+    const column = await this.columnRepo.getByIdAfterEnsuringInBoard(
+      columnId,
+      boardId,
+    );
 
-    await this.columnPolicy.ensureEmptyPosition(position, boardId);
+    await this.columnPolicy.ensureEmptyPositionInBoard(position, boardId);
     column.updatePosition(position);
 
     await this.columnRepo.save(column);

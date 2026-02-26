@@ -1,22 +1,15 @@
-import { BoardMembership } from "../../entities/board_membership";
-import type { Card } from "../../entities/card";
-import type { Column } from "../../entities/column";
+import type { CardPolicy } from "../../interfaces/policy/card-policy.interface";
+import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
+import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { CardRepository } from "../../interfaces/repo/card-repository.interface";
-import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
-import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class ReorderCard {
   constructor(
-    private memberRepo: MemberRepository,
-    private columnRepo: ColumnRepository,
     private cardRepo: CardRepository,
+    private memberPolicy: MemberPolicy,
+    private columnPolicy: ColumnPolicy,
+    private cardPolicy: CardPolicy,
   ) {}
-
-  private columnBelongsToBoard = (column: Column, boardId: string) =>
-    column.attrbs.boardId === boardId;
-
-  private belongsToColumn = (card: Card, columnId: string) =>
-    card.attrbs.columnId === columnId;
 
   execute = async (
     cardId: string,
@@ -25,37 +18,23 @@ export class ReorderCard {
     boardId: string,
     userId: string,
   ) => {
-    const member = new BoardMembership({ boardId, memberId: userId });
-    const isMember = await this.memberRepo.exists(member);
-    if (!isMember)
-      throw new Error(
-        "Non-member cannot update body of cards in column of a board.",
-      );
+    await this.memberPolicy.ensureMember(userId, boardId);
+    await this.columnPolicy.ensureColumnInBoard(columnId, boardId);
 
-    const column = await this.columnRepo.getById(columnId);
-    if (!this.columnBelongsToBoard(column, boardId))
-      throw new Error("Requested board does not have requested column.");
-
-    const card = await this.cardRepo.getById(cardId);
-    if (!this.belongsToColumn(card, columnId))
-      throw new Error("Requested column does not have requested card.");
+    const card = await this.cardRepo.getByIdAfterEnsuringInColumn(
+      cardId,
+      columnId,
+    );
 
     if (location.columnId) {
-      const newColumn = await this.columnRepo.getById(location.columnId);
-      if (!this.columnBelongsToBoard(newColumn, boardId))
-        throw new Error(
-          "New column does not belong to board you are member of.",
-        );
-
+      await this.columnPolicy.ensureColumnInBoard(location.columnId, boardId);
       card.updateColumn(location.columnId);
     }
 
-    const cardOnPosition = await this.cardRepo.getByPositionInColumn(
+    await this.cardPolicy.ensureEmptyPositionInColumn(
       location.position,
-      location.columnId ?? columnId,
+      columnId,
     );
-    if (cardOnPosition) throw new Error("Position is already occupied.");
-
     card.updatePosition(location.position);
 
     await this.cardRepo.save(card);

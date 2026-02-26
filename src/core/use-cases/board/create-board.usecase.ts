@@ -7,20 +7,20 @@ import type { IdGenerator } from "../../interfaces/utils/id-generator.interface"
 
 export class CreateBoard {
   constructor(
+    private uow: UnitOfWork,
     private idGen: IdGenerator,
     private boardRepo: BoardRepository,
     private memberRepo: MemberRepository,
-    private uow: UnitOfWork,
   ) {}
 
-  execute = async (name: string, ownerId: string) => {
-    const boardId = this.idGen.generate();
+  execute = async (name: string, userId: string) => {
+    const boardId = await this.idGen.generateUnique();
 
     await this.uow.withTransaction(async () => {
-      const board = new Board({ id: boardId, name, ownerId });
+      const board = new Board({ id: boardId, name, ownerId: userId });
       await this.boardRepo.save(board);
 
-      const member = new BoardMembership({ boardId, memberId: ownerId });
+      const member = new BoardMembership({ boardId, memberId: userId });
       await this.memberRepo.save(member);
     });
   };

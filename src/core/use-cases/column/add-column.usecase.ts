@@ -15,12 +15,11 @@ export class AddColumn {
   execute = async (name: string, boardId: string, userId: string) => {
     await this.memberPolicy.ensureMember(userId, boardId);
 
-    const columnId = this.idGen.generate();
-
-    const topColumn = await this.columnRepo.getTopColumn();
-    const position = topColumn
-      ? topColumn.attrbs.position + this.POSITION_STEP
-      : 0;
+    const columnId = await this.idGen.generateUnique();
+    const position = await this.columnRepo.getNextEmptyPositionInBoard(
+      boardId,
+      this.POSITION_STEP,
+    );
 
     const column = new Column({ id: columnId, name, boardId, position });
     await this.columnRepo.save(column);

@@ -1,15 +1,13 @@
-import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
 
 export class UpdateBoardName {
-  constructor(
-    private boardRepo: BoardRepository,
-    private memberPolicy: MemberPolicy,
-  ) {}
+  constructor(private boardRepo: BoardRepository) {}
 
-  execute = async (boardId: string, memberId: string, name: string) => {
-    const board = await this.boardRepo.getById(boardId);
-    await this.memberPolicy.ensureMember(memberId, board.id);
+  execute = async (boardId: string, userId: string, name: string) => {
+    const board = await this.boardRepo.getByIdAfterEnsuringMember(
+      boardId,
+      userId,
+    );
 
     board.updateName(name);
     await this.boardRepo.save(board);

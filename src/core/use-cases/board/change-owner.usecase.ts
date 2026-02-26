@@ -7,12 +7,14 @@ export class ChangeOwner {
     private memberPolicy: MemberPolicy,
   ) {}
 
-  execute = async (boardId: string, ownerId: string, memberId: string) => {
-    const board = await this.boardRepo.getById(boardId);
-    await this.memberPolicy.ensureOwner(ownerId, board.id);
+  execute = async (boardId: string, ownerId: string, userId: string) => {
+    const board = await this.boardRepo.getByIdAfterEnsuringOwner(
+      boardId,
+      ownerId,
+    );
 
-    await this.memberPolicy.ensureMember(memberId, board.id);
-    board.transferOwnershipTo(memberId);
+    await this.memberPolicy.ensureMember(userId, board.id);
+    board.transferOwnershipTo(userId);
 
     await this.boardRepo.save(board);
   };
