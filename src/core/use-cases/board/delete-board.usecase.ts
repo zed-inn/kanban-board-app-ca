@@ -10,12 +10,12 @@ export class DeleteBoard {
   ) {}
 
   execute = async (boardId: string, userId: string) => {
-    await this.uow.withTransaction(async () => {
-      const board = await this.boardRepo.getByIdAfterEnsuringOwner(
-        boardId,
-        userId,
-      );
+    const board = await this.boardRepo.getByIdAfterEnsuringOwner(
+      boardId,
+      userId,
+    );
 
+    await this.uow.withTransaction(async () => {
       await this.boardRepo.remove(board);
       await this.memberRepo.removeAllMembersOfBoard(board);
     });
