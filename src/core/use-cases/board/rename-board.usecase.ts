@@ -1,6 +1,6 @@
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
 
-export class UpdateBoardName {
+export class RenameBoard {
   constructor(private boardRepo: BoardRepository) {}
 
   execute = async (boardId: string, userId: string, name: string) => {
