@@ -1,7 +1,6 @@
-import { BoardMembership } from "../../entities/board_membership";
 import { Column } from "../../entities/column";
+import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
-import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 import type { IdGenerator } from "../../interfaces/utils/id-generator.interface";
 
 export class AddColumn {
@@ -9,18 +8,15 @@ export class AddColumn {
 
   constructor(
     private idGen: IdGenerator,
-    private memberRepo: MemberRepository,
     private columnRepo: ColumnRepository,
+    private memberPolicy: MemberPolicy,
   ) {}
 
   execute = async (name: string, boardId: string, userId: string) => {
-    const member = new BoardMembership({ boardId, memberId: userId });
-    const isMember = await this.memberRepo.exists(member);
-
-    if (!isMember)
-      throw new Error("Non-member of a board cannot add columns to the board.");
+    await this.memberPolicy.ensureMember(userId, boardId);
 
     const columnId = this.idGen.generate();
+
     const topColumn = await this.columnRepo.getTopColumn();
     const position = topColumn
       ? topColumn.attrbs.position + this.POSITION_STEP

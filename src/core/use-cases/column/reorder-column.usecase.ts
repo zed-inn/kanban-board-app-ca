@@ -1,16 +1,13 @@
-import { BoardMembership } from "../../entities/board_membership";
-import type { Column } from "../../entities/column";
+import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
+import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
-import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class ReorderColumn {
   constructor(
-    private memberRepo: MemberRepository,
+    private memberPolicy: MemberPolicy,
     private columnRepo: ColumnRepository,
+    private columnPolicy: ColumnPolicy,
   ) {}
-
-  private belongsToBoard = (column: Column, boardId: string) =>
-    column.attrbs.boardId === boardId;
 
   execute = async (
     columnId: string,
@@ -18,24 +15,14 @@ export class ReorderColumn {
     boardId: string,
     userId: string,
   ) => {
-    const member = new BoardMembership({ boardId, memberId: userId });
-    const isMember = await this.memberRepo.exists(member);
-
-    if (!isMember)
-      throw new Error("Non-members of a board cannot re/order columns.");
+    await this.memberPolicy.ensureMember(userId, boardId);
 
     const column = await this.columnRepo.getById(columnId);
+    await this.columnPolicy.ensureColumnInBoard(column.id, boardId);
 
-    if (!this.belongsToBoard(column, boardId))
-      throw new Error("Requested board does not have requested column.");
-
-    const columnOnPosition = await this.columnRepo.getByPositionInBoard(
-      position,
-      boardId,
-    );
-    if (columnOnPosition) throw new Error("Position is already occupied.");
-
+    await this.columnPolicy.ensureEmptyPosition(position, boardId);
     column.updatePosition(position);
+
     await this.columnRepo.save(column);
   };
 }
