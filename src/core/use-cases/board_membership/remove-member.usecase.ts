@@ -1,16 +1,20 @@
 import { BoardMembership } from "../../entities/board_membership";
+import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
+import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class RemoveMember {
-  constructor(private memberRepo: MemberRepository) {}
+  constructor(
+    private boardRepo: BoardRepository,
+    private memberRepo: MemberRepository,
+    private memberPolicy: MemberPolicy,
+  ) {}
 
   execute = async (boardId: string, memberId: string) => {
-    const member = new BoardMembership({ boardId, memberId });
-    const isMember = await this.memberRepo.exists(member);
+    const board = await this.boardRepo.getById(boardId);
+    await this.memberPolicy.ensureMember(memberId, board.id);
 
-    if (!isMember)
-      throw new Error("Board cannot be leaved without membership priviledges.");
-
+    const member = new BoardMembership({ boardId: board.id, memberId });
     await this.memberRepo.remove(member);
   };
 }

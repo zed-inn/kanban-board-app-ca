@@ -1,20 +1,21 @@
 import { BoardMembership } from "../../entities/board_membership";
+import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
+import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class AddMember {
-  constructor(private memberRepo: MemberRepository) {}
+  constructor(
+    private boardRepo: BoardRepository,
+    private memberRepo: MemberRepository,
+    private memberPolicy: MemberPolicy,
+  ) {}
 
-  execute = async (boardId: string, memberId: string, newMemberId: string) => {
-    const member = new BoardMembership({ boardId, memberId });
-    const isMember = await this.memberRepo.exists(member);
+  execute = async (boardId: string, memberId: string, userId: string) => {
+    const board = await this.boardRepo.getById(boardId);
+    await this.memberPolicy.ensureMember(memberId, board.id);
 
-    if (!isMember)
-      throw new Error("Non-member of a board cannot add members to a board.");
-
-    const newMember = new BoardMembership({ boardId, memberId: newMemberId });
-    const isNotNewMember = await this.memberRepo.exists(newMember);
-    const isNewMember = !isNotNewMember;
-
-    if (isNewMember) await this.memberRepo.save(newMember);
+    await this.memberPolicy.ensureNonMember(userId, board.id);
+    const member = new BoardMembership({ boardId: board.id, memberId: userId });
+    await this.memberRepo.save(member);
   };
 }

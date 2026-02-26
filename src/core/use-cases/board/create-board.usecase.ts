@@ -13,14 +13,14 @@ export class CreateBoard {
     private uow: UnitOfWork,
   ) {}
 
-  execute = async (name: string, userId: string) => {
+  execute = async (name: string, ownerId: string) => {
     const boardId = this.idGen.generate();
 
     await this.uow.withTransaction(async () => {
-      const board = new Board({ id: boardId, name, ownerId: userId });
+      const board = new Board({ id: boardId, name, ownerId });
       await this.boardRepo.save(board);
 
-      const member = new BoardMembership({ boardId, memberId: userId });
+      const member = new BoardMembership({ boardId, memberId: ownerId });
       await this.memberRepo.save(member);
     });
   };

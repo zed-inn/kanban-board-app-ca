@@ -1,21 +1,20 @@
+import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 import type { UnitOfWork } from "../../interfaces/utils/unit-of-work.interface";
 
 export class DeleteBoard {
   constructor(
+    private uow: UnitOfWork,
     private boardRepo: BoardRepository,
     private memberRepo: MemberRepository,
-    private uow: UnitOfWork,
+    private memberPolicy: MemberPolicy,
   ) {}
 
-  execute = async (boardId: string, userId: string) => {
-    return await this.uow.withTransaction(async () => {
+  execute = async (boardId: string, ownerId: string) => {
+    await this.uow.withTransaction(async () => {
       const board = await this.boardRepo.getById(boardId);
-      if (board.attrbs.ownerId !== userId)
-        throw new Error(
-          "Board cannot be deleted without ownership priviledges.",
-        );
+      await this.memberPolicy.ensureOwner(ownerId, board.id);
 
       await this.boardRepo.remove(board);
       await this.memberRepo.removeAllMembersOfBoard(board);

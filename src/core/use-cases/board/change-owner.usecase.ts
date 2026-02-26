@@ -1,28 +1,17 @@
-import { BoardMembership } from "../../entities/board_membership";
+import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
-import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class ChangeOwner {
   constructor(
     private boardRepo: BoardRepository,
-    private memberRepo: MemberRepository,
+    private memberPolicy: MemberPolicy,
   ) {}
 
   execute = async (boardId: string, ownerId: string, memberId: string) => {
     const board = await this.boardRepo.getById(boardId);
-    const isOwner = board.attrbs.ownerId === ownerId;
+    await this.memberPolicy.ensureOwner(ownerId, board.id);
 
-    if (!isOwner)
-      throw new Error(
-        "Changing owner cannot be done without ownership priviledges.",
-      );
-
-    const member = new BoardMembership({ boardId, memberId });
-    const isMember = await this.memberRepo.exists(member);
-
-    if (!isMember)
-      throw new Error("Only a member of the board can replace the owner.");
-
+    await this.memberPolicy.ensureMember(memberId, board.id);
     board.transferOwnershipTo(memberId);
 
     await this.boardRepo.save(board);
