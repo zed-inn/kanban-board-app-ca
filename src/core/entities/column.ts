@@ -1,5 +1,5 @@
 export class Column {
-  private id: string;
+  private _id: string;
   private name: string;
   private position: number;
   private boardId: string;
@@ -14,7 +14,7 @@ export class Column {
     params.id = params.id.trim();
     if (params.id.length < 1) throw new Error("Column Id cannot be empty.");
 
-    this.id = params.id;
+    this._id = params.id;
 
     if (typeof params.name !== "string")
       throw new Error("Invalid column name.");
@@ -38,11 +38,15 @@ export class Column {
 
   public get attrbs() {
     return {
-      id: this.id,
+      id: this._id,
       name: this.name,
       position: this.position,
       boardId: this.boardId,
     };
+  }
+
+  public get() {
+    return this._id;
   }
 
   public updateName = (name: string) => {

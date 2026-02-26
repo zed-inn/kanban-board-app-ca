@@ -1,5 +1,5 @@
 export class Board {
-  private id: string;
+  private _id: string;
   private name: string;
   private ownerId: string;
 
@@ -8,7 +8,7 @@ export class Board {
     params.id = params.id.trim();
     if (params.id.length < 1) throw new Error("Board Id cannot be empty.");
 
-    this.id = params.id;
+    this._id = params.id;
 
     if (typeof params.name !== "string") throw new Error("Invalid board name.");
     params.name = params.name.trim();
@@ -25,7 +25,11 @@ export class Board {
   }
 
   public get attrbs() {
-    return { id: this.id, name: this.name, ownerId: this.ownerId };
+    return { id: this._id, name: this.name, ownerId: this.ownerId };
+  }
+
+  public get id() {
+    return this._id;
   }
 
   public updateName = (name: string) => {
