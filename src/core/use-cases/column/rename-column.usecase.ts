@@ -19,7 +19,7 @@ export class RenameColumn {
       columnId,
       boardId,
     );
-    column.updateName(name);
+    column.rename(name);
 
     await this.columnRepo.save(column);
   };

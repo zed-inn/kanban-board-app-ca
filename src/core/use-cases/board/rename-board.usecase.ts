@@ -9,7 +9,7 @@ export class RenameBoard {
       userId,
     );
 
-    board.updateName(name);
+    board.rename(name);
     await this.boardRepo.save(board);
   };
 }

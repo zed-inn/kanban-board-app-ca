@@ -23,7 +23,7 @@ export class ReorderColumn {
     );
 
     await this.columnPolicy.ensureEmptyPositionInBoard(position, boardId);
-    column.updatePosition(position);
+    column.moveTo(position);
 
     await this.columnRepo.save(column);
   };

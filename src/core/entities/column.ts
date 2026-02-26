@@ -49,7 +49,7 @@ export class Column {
     return this._id;
   }
 
-  public updateName = (name: string) => {
+  public rename = (name: string) => {
     if (typeof name !== "string") throw new Error("Invalid column name.");
     name = name.trim();
     if (name.length < 1) throw new Error("Column name cannot be empty.");
@@ -57,7 +57,7 @@ export class Column {
     this.name = name;
   };
 
-  public updatePosition = (position: number) => {
+  public moveTo = (position: number) => {
     if (typeof position !== "number" || isNaN(position))
       throw new Error("Invalid column position.");
 

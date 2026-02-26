@@ -28,14 +28,14 @@ export class ReorderCard {
 
     if (location.columnId) {
       await this.columnPolicy.ensureColumnInBoard(location.columnId, boardId);
-      card.updateColumn(location.columnId);
+      card.relocateToNewColumn(location.columnId);
     }
 
     await this.cardPolicy.ensureEmptyPositionInColumn(
       location.position,
       columnId,
     );
-    card.updatePosition(location.position);
+    card.moveTo(location.position);
 
     await this.cardRepo.save(card);
   };

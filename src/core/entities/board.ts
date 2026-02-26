@@ -32,7 +32,7 @@ export class Board {
     return this._id;
   }
 
-  public updateName = (name: string) => {
+  public rename = (name: string) => {
     if (typeof name !== "string") throw new Error("Invalid board name.");
     name = name.trim();
     if (name.length < 1) throw new Error("Board name cannot be empty.");

@@ -77,12 +77,12 @@ export class Card {
     }
   };
 
-  public updatePosition = (position: number) => {
+  public moveTo = (position: number) => {
     if (typeof position !== "number") throw new Error("Invalid card position.");
     this.position = position;
   };
 
-  public updateColumn = (columnId: string) => {
+  public relocateToNewColumn = (columnId: string) => {
     if (typeof columnId !== "string") throw new Error("Invalid column id.");
     columnId = columnId.trim();
     if (columnId.length < 1) throw new Error("Column Id cannot be empty.");
