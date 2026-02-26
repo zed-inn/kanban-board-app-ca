@@ -1,5 +1,5 @@
 export class Card {
-  private _id: string;
+  private id: string;
   private title: string;
   private content: string | null;
   private position: number;
@@ -16,7 +16,7 @@ export class Card {
     params.id = params.id.trim();
     if (params.id.length < 1) throw new Error("Card Id cannot be empty.");
 
-    this._id = params.id;
+    this.id = params.id;
 
     if (typeof params.title !== "string")
       throw new Error("Invalid card title.");
@@ -46,16 +46,12 @@ export class Card {
 
   public get attrbs() {
     return {
-      id: this._id,
+      id: this.id,
       title: this.title,
       content: this.content,
       postition: this.position,
       columnId: this.columnId,
     };
-  }
-
-  public get id() {
-    return this._id;
   }
 
   public updateBody = (params: { title?: string; content?: string | null }) => {
