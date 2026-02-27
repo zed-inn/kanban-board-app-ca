@@ -1,3 +1,4 @@
+import { CardNotInColumnError } from "../../errors/card.error";
 import type { CardActionEmitter } from "../../interfaces/emitter/card-action-emitter.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
@@ -22,10 +23,9 @@ export class RemoveCard {
     await this.memberPolicy.ensureMember(userId, boardId);
     await this.columnPolicy.ensureColumnInBoard(columnId, boardId);
 
-    const card = await this.cardRepo.getByIdAfterEnsuringInColumn(
-      cardId,
-      columnId,
-    );
+    const card = await this.cardRepo.getById(cardId);
+    if (card.attrbs.columnId !== columnId) throw new CardNotInColumnError();
+
     await this.cardRepo.remove(card);
 
     const members = await this.memberRepo.getAllMembersOfBoardById(boardId);

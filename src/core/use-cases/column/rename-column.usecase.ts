@@ -1,3 +1,4 @@
+import { ColumnNotInBoardError } from "../../errors/column.error";
 import type { ColumnActionEmitter } from "../../interfaces/emitter/column-action-emitter.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
@@ -19,12 +20,10 @@ export class RenameColumn {
   ) => {
     await this.memberPolicy.ensureMember(userId, boardId);
 
-    const column = await this.columnRepo.getByIdAfterEnsuringInBoard(
-      columnId,
-      boardId,
-    );
-    column.rename(name);
+    const column = await this.columnRepo.getById(columnId);
+    if (column.attrbs.boardId !== boardId) throw new ColumnNotInBoardError();
 
+    column.rename(name);
     await this.columnRepo.save(column);
 
     const members = await this.memberRepo.getAllMembersOfBoardById(boardId);

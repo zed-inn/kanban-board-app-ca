@@ -1,3 +1,4 @@
+import { ColumnNotInBoardError } from "../../errors/column.error";
 import type { ColumnActionEmitter } from "../../interfaces/emitter/column-action-emitter.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
@@ -21,10 +22,8 @@ export class ReorderColumn {
   ) => {
     await this.memberPolicy.ensureMember(userId, boardId);
 
-    const column = await this.columnRepo.getByIdAfterEnsuringInBoard(
-      columnId,
-      boardId,
-    );
+    const column = await this.columnRepo.getById(columnId);
+    if (column.attrbs.boardId !== boardId) throw new ColumnNotInBoardError();
 
     await this.columnPolicy.ensureEmptyPositionInBoard(position, boardId);
     column.moveTo(position);

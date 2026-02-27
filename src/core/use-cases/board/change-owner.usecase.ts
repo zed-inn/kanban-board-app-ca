@@ -1,4 +1,4 @@
-import { User } from "../../entities/user";
+import { NotBoardOwnerError } from "../../errors/board.error";
 import type { BoardActionEmitter } from "../../interfaces/emitter/board-action-emitter.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
@@ -13,10 +13,8 @@ export class ChangeOwner {
   ) {}
 
   execute = async (boardId: string, ownerId: string, userId: string) => {
-    const board = await this.boardRepo.getByIdAfterEnsuringOwner(
-      boardId,
-      ownerId,
-    );
+    const board = await this.boardRepo.getById(boardId);
+    if (board.attrbs.ownerId !== ownerId) throw new NotBoardOwnerError();
 
     await this.memberPolicy.ensureMember(userId, board.id);
     board.transferOwnershipTo(userId);

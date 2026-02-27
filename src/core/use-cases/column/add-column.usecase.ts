@@ -16,14 +16,16 @@ export class AddColumn {
     private columnActionEmit: ColumnActionEmitter,
   ) {}
 
+  private nextPosition = async (boardId: string) => {
+    const topColumn = await this.columnRepo.getTopInBoard(boardId);
+    return topColumn ? topColumn.attrbs.position + this.POSITION_STEP : 0;
+  };
+
   execute = async (name: string, boardId: string, userId: string) => {
     await this.memberPolicy.ensureMember(userId, boardId);
 
     const columnId = await this.idGen.generateUnique();
-    const position = await this.columnRepo.getNextEmptyPositionInBoard(
-      boardId,
-      this.POSITION_STEP,
-    );
+    const position = await this.nextPosition(boardId);
 
     const column = new Column({ id: columnId, name, boardId, position });
     await this.columnRepo.save(column);

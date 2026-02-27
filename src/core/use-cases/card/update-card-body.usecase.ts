@@ -1,3 +1,7 @@
+import {
+  CardNotInColumnError,
+  ParamsInsufficientCardBodyUpdateError,
+} from "../../errors/card.error";
 import type { CardActionEmitter } from "../../interfaces/emitter/card-action-emitter.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
@@ -13,11 +17,12 @@ export class UpdateCardBody {
     private cardActionEmit: CardActionEmitter,
   ) {}
 
-  private atleastOneParamGiven = (body: {
+  private ensureTitleOrContentGiven = (body: {
     title?: string;
     content?: string | null;
   }) => {
-    return body.title !== undefined || body.content !== undefined;
+    if (body.title === undefined && body.content === undefined)
+      throw new ParamsInsufficientCardBodyUpdateError();
   };
 
   execute = async (
@@ -30,12 +35,10 @@ export class UpdateCardBody {
     await this.memberPolicy.ensureMember(userId, boardId);
     await this.columnPolicy.ensureColumnInBoard(columnId, boardId);
 
-    const card = await this.cardRepo.getByIdAfterEnsuringInColumn(
-      cardId,
-      columnId,
-    );
+    const card = await this.cardRepo.getById(cardId);
+    if (card.attrbs.columnId !== columnId) throw new CardNotInColumnError();
 
-    if (!this.atleastOneParamGiven(body)) throw new Error("Nothing to update.");
+    this.ensureTitleOrContentGiven(body);
     card.updateBody(body);
 
     await this.cardRepo.save(card);

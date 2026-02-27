@@ -18,6 +18,11 @@ export class AddCard {
     private cardActionEmit: CardActionEmitter,
   ) {}
 
+  private nextPosition = async (columnId: string) => {
+    const topCard = await this.cardRepo.getTopInColumn(columnId);
+    return topCard ? topCard.attrbs.postition + this.POSITION_STEP : 0;
+  };
+
   execute = async (
     title: string,
     content: string | null,
@@ -29,10 +34,7 @@ export class AddCard {
     await this.columnPolicy.ensureColumnInBoard(columnId, boardId);
 
     const cardId = await this.idGen.generateUnique();
-    const position = await this.cardRepo.getNextEmptyPositionInColumn(
-      columnId,
-      this.POSITION_STEP,
-    );
+    const position = await this.nextPosition(columnId);
 
     const card = new Card({ id: cardId, title, content, position, columnId });
     await this.cardRepo.save(card);
