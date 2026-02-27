@@ -1,10 +1,15 @@
+import { User } from "../../entities/user";
+import type { BoardActionEmitter } from "../../interfaces/emitter/board-action-emitter.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
+import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class ChangeOwner {
   constructor(
     private boardRepo: BoardRepository,
+    private memberRepo: MemberRepository,
     private memberPolicy: MemberPolicy,
+    private boardActionEmit: BoardActionEmitter,
   ) {}
 
   execute = async (boardId: string, ownerId: string, userId: string) => {
@@ -17,5 +22,9 @@ export class ChangeOwner {
     board.transferOwnershipTo(userId);
 
     await this.boardRepo.save(board);
+
+    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
+    this.boardActionEmit.emitOwnerChange(members, board);
+    this.boardActionEmit.emitOwnershipTransferredToNewOwnerById(userId, board);
   };
 }

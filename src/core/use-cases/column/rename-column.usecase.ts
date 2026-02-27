@@ -1,10 +1,14 @@
+import type { ColumnActionEmitter } from "../../interfaces/emitter/column-action-emitter.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
+import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class RenameColumn {
   constructor(
-    private memberPolicy: MemberPolicy,
+    private memberRepo: MemberRepository,
     private columnRepo: ColumnRepository,
+    private memberPolicy: MemberPolicy,
+    private columnActionEmit: ColumnActionEmitter,
   ) {}
 
   execute = async (
@@ -22,5 +26,8 @@ export class RenameColumn {
     column.rename(name);
 
     await this.columnRepo.save(column);
+
+    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
+    this.columnActionEmit.emitColumnRenamed(members, column);
   };
 }

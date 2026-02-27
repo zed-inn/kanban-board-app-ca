@@ -1,10 +1,14 @@
+import type { ColumnActionEmitter } from "../../interfaces/emitter/column-action-emitter.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
+import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class RemoveColumn {
   constructor(
-    private memberPolicy: MemberPolicy,
+    private memberRepo: MemberRepository,
     private columnRepo: ColumnRepository,
+    private memberPolicy: MemberPolicy,
+    private columnActionEmit: ColumnActionEmitter,
   ) {}
 
   execute = async (columnId: string, boardId: string, userId: string) => {
@@ -15,5 +19,8 @@ export class RemoveColumn {
       boardId,
     );
     await this.columnRepo.remove(column);
+
+    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
+    this.columnActionEmit.emitColumnRemoved(members, column);
   };
 }

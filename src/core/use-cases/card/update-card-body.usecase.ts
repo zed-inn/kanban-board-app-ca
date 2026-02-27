@@ -1,12 +1,16 @@
+import type { CardActionEmitter } from "../../interfaces/emitter/card-action-emitter.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { CardRepository } from "../../interfaces/repo/card-repository.interface";
+import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 
 export class UpdateCardBody {
   constructor(
+    private memberRepo: MemberRepository,
     private cardRepo: CardRepository,
     private memberPolicy: MemberPolicy,
     private columnPolicy: ColumnPolicy,
+    private cardActionEmit: CardActionEmitter,
   ) {}
 
   private atleastOneParamGiven = (body: {
@@ -35,5 +39,8 @@ export class UpdateCardBody {
     card.updateBody(body);
 
     await this.cardRepo.save(card);
+
+    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
+    this.cardActionEmit.emitCardBodyUpdated(members, card);
   };
 }

@@ -1,3 +1,6 @@
+import type { BoardActionEmitter } from "./core/interfaces/emitter/board-action-emitter.interface";
+import type { CardActionEmitter } from "./core/interfaces/emitter/card-action-emitter.interface";
+import type { ColumnActionEmitter } from "./core/interfaces/emitter/column-action-emitter.interface";
 import type { CardPolicy } from "./core/interfaces/policy/card-policy.interface";
 import type { ColumnPolicy } from "./core/interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "./core/interfaces/policy/member-policy.interface";
@@ -51,36 +54,92 @@ export class Application {
     private memberPolicy: MemberPolicy,
     private columnPolicy: ColumnPolicy,
     private cardPolicy: CardPolicy,
+    private boardActionEmitter: BoardActionEmitter,
+    private columnActionEmitter: ColumnActionEmitter,
+    private cardActionEmitter: CardActionEmitter,
   ) {
-    this.changeOwnerOfBoard = new ChangeOwner(boardRepo, memberPolicy);
+    this.changeOwnerOfBoard = new ChangeOwner(
+      boardRepo,
+      memberRepo,
+      memberPolicy,
+      boardActionEmitter,
+    );
     this.createBoard = new CreateBoard(uow, idGen, boardRepo, memberRepo);
-    this.deleteBoard = new DeleteBoard(uow, boardRepo, memberRepo);
-    this.renameBoard = new RenameBoard(boardRepo);
+    this.deleteBoard = new DeleteBoard(
+      uow,
+      boardRepo,
+      memberRepo,
+      boardActionEmitter,
+    );
+    this.renameBoard = new RenameBoard(
+      boardRepo,
+      memberRepo,
+      boardActionEmitter,
+    );
 
-    this.addMember = new AddMember(boardRepo, memberRepo);
-    this.removeMember = new RemoveMember(boardRepo, memberRepo);
+    this.addMember = new AddMember(boardRepo, memberRepo, boardActionEmitter);
+    this.removeMember = new RemoveMember(
+      boardRepo,
+      memberRepo,
+      boardActionEmitter,
+    );
 
-    this.addCard = new AddCard(idGen, cardRepo, memberPolicy, columnPolicy);
-    this.removeCard = new RemoveCard(cardRepo, memberPolicy, columnPolicy);
+    this.addColumn = new AddColumn(
+      idGen,
+      memberRepo,
+      columnRepo,
+      memberPolicy,
+      columnActionEmitter,
+    );
+    this.removeColumn = new RemoveColumn(
+      memberRepo,
+      columnRepo,
+      memberPolicy,
+      columnActionEmitter,
+    );
+    this.reorderColumn = new ReorderColumn(
+      memberRepo,
+      columnRepo,
+      memberPolicy,
+      columnPolicy,
+      columnActionEmitter,
+    );
+    this.renameColumn = new RenameColumn(
+      memberRepo,
+      columnRepo,
+      memberPolicy,
+      columnActionEmitter,
+    );
+
+    this.addCard = new AddCard(
+      idGen,
+      memberRepo,
+      cardRepo,
+      memberPolicy,
+      columnPolicy,
+      cardActionEmitter,
+    );
+    this.removeCard = new RemoveCard(
+      memberRepo,
+      cardRepo,
+      memberPolicy,
+      columnPolicy,
+      cardActionEmitter,
+    );
     this.reorderCard = new ReorderCard(
+      memberRepo,
       cardRepo,
       memberPolicy,
       columnPolicy,
       cardPolicy,
+      cardActionEmitter,
     );
     this.updateCardBody = new UpdateCardBody(
+      memberRepo,
       cardRepo,
       memberPolicy,
       columnPolicy,
+      cardActionEmitter,
     );
-
-    this.addColumn = new AddColumn(idGen, columnRepo, memberPolicy);
-    this.removeColumn = new RemoveColumn(memberPolicy, columnRepo);
-    this.reorderColumn = new ReorderColumn(
-      memberPolicy,
-      columnRepo,
-      columnPolicy,
-    );
-    this.renameColumn = new RenameColumn(memberPolicy, columnRepo);
   }
 }

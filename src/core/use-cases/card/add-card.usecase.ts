@@ -1,7 +1,9 @@
 import { Card } from "../../entities/card";
+import type { CardActionEmitter } from "../../interfaces/emitter/card-action-emitter.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { CardRepository } from "../../interfaces/repo/card-repository.interface";
+import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 import type { IdGenerator } from "../../interfaces/utils/id-generator.interface";
 
 export class AddCard {
@@ -9,9 +11,11 @@ export class AddCard {
 
   constructor(
     private idGen: IdGenerator,
+    private memberRepo: MemberRepository,
     private cardRepo: CardRepository,
     private memberPolicy: MemberPolicy,
     private columnPolicy: ColumnPolicy,
+    private cardActionEmit: CardActionEmitter,
   ) {}
 
   execute = async (
@@ -32,5 +36,8 @@ export class AddCard {
 
     const card = new Card({ id: cardId, title, content, position, columnId });
     await this.cardRepo.save(card);
+
+    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
+    this.cardActionEmit.emitCardAdded(members, card);
   };
 }
