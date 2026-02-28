@@ -20,7 +20,7 @@ export class AddCard {
 
   private nextPosition = async (columnId: string) => {
     const topCard = await this.cardRepo.getTopInColumn(columnId);
-    return topCard ? topCard.attrbs.postition + this.POSITION_STEP : 0;
+    return topCard ? topCard.attrbs.position + this.POSITION_STEP : 0;
   };
 
   private emitEvents = async (card: Card, boardId: string, userId: string) => {

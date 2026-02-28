@@ -49,7 +49,7 @@ export class Card {
       id: this._id,
       title: this.title,
       content: this.content,
-      postition: this.position,
+      position: this.position,
       columnId: this.columnId,
     };
   }
