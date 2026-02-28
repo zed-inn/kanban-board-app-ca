@@ -29,7 +29,7 @@ export class UpdateCardBody {
   private emitEvents = async (card: Card, boardId: string, userId: string) => {
     const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
     this.eventEmitter.emit({
-      name: "CARD_REORDERED",
+      name: "CARD_BODY_UPDATED",
       detail: card.attrbs,
       userIds: memberIds.filter((m) => m != userId),
     });

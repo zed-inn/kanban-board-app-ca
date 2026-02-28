@@ -20,7 +20,7 @@ export class ReorderCard {
   private emitEvents = async (card: Card, boardId: string, userId: string) => {
     const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
     this.eventEmiter.emit({
-      name: "CARD_RENAMED",
+      name: "CARD_REORDERED",
       detail: card.attrbs,
       userIds: memberIds.filter((m) => m != userId),
     });
