@@ -53,8 +53,6 @@
 ```ts
 interface BoardRepository {
   getById(id: string): Promise<Board>;
-  getByIdAfterEnsuringOwner(id: string, ownerId: string): Promise<Board>;
-  getByIdAfterEnsuringMember(id: string, memberId: string): Promise<Board>;
   save(board: Board): Promise<void>;
   remove(board: Board): Promise<void>;
 }
@@ -64,8 +62,8 @@ interface BoardRepository {
 ```ts
 interface MemberRepository {
   exists(membership: BoardMembership): Promise<boolean>;
-  getAllMembersOfBoardById(boardId: string): Promise<User[]>;
-  removeAllMembersOfBoard(board: Board): Promise<void>;
+  getAllBoardMemberIdsById(boardId: string): Promise<string[]>;
+  removeAllBoardMembers(board: Board): Promise<void>;
   remove(membership: BoardMembership): Promise<void>;
   save(membership: BoardMembership): Promise<void>;
 }
@@ -73,17 +71,9 @@ interface MemberRepository {
 
 - Column Repository
 ```ts
-ColumnRepository {
+interface ColumnRepository {
   getById(id: string): Promise<Column>;
-  getByIdAfterEnsuringInBoard(id: string, boardId: string): Promise<Column>;
-  getByPositionInBoard(
-    position: number,
-    boardId: string,
-  ): Promise<Column | null>;
-  getNextEmptyPositionInBoard(
-    boardId: string,
-    positionStep: number,
-  ): Promise<number>;
+  getTopInBoard(boardId: string): Promise<Column | null>;
   remove(column: Column): Promise<void>;
   save(column: Column): Promise<void>;
 }
@@ -91,17 +81,9 @@ ColumnRepository {
 
 - Card Repository
 ```ts
-CardRepository {
+interface CardRepository {
   getById(id: string): Promise<Card>;
-  getByIdAfterEnsuringInColumn(id: string, columnId: string): Promise<Card>;
-  getByPositionInColumn(
-    position: number,
-    columnId: string,
-  ): Promise<Card | null>;
-  getNextEmptyPositionInColumn(
-    columnId: string,
-    positionStep: number,
-  ): Promise<number>;
+  getTopInColumn(columnId: string): Promise<Card | null>;
   remove(card: Card): Promise<void>;
   save(card: Card): Promise<void>;
 }
@@ -111,6 +93,7 @@ CardRepository {
 - Member Policy
 ```ts
 interface MemberPolicy {
+  ensureOwner(boardId: string, ownerId: string): Promise<void>;
   ensureMember(memberId: string, boardId: string): Promise<void>;
 }
 ```
@@ -149,44 +132,10 @@ export interface IdGenerator {
 ```
 
 ### Emitter
-- Board Action Emitter
-```ts
-interface BoardActionEmitter {
-  emitOwnerChange(users: User[], board: Board): Promise<void>;
-  emitOwnershipTransferredToNewOwnerById(
-    userId: string,
-    board: Board,
-  ): Promise<void>;
-  emitBoardDeleted(users: User[], board: Board): Promise<void>;
-  emitBoardRenamed(users: User[], board: Board): Promise<void>;
-  emitNewMemberJoined(users: User[], board: Board): Promise<void>;
-  emitMembershipCreatedToNewMemberById(
-    userId: string,
-    board: Board,
-  ): Promise<void>;
-  emitMemberLeft(users: User[], board: Board): Promise<void>;
-}
-```
-
-- Column Action Emitter
-```ts
-interface ColumnActionEmitter {
-  emitColumnAdded(users: User[], column: Column): Promise<void>;
-  emitColumnRemoved(users: User[], column: Column): Promise<void>;
-  emitColumnRenamed(users: User[], column: Column): Promise<void>;
-  emitColumnReordered(users: User[], column: Column): Promise<void>;
-}
-```
-
-- Card Action Emitter
-```ts
-interface CardActionEmitter {
-  emitCardAdded(users: User[], card: Card): Promise<void>;
-  emitCardRemoved(users: User[], card: Card): Promise<void>;
-  emitCardBodyUpdated(users: User[], card: Card): Promise<void>;
-  emitCardReordered(users: User[], card: Card): Promise<void>;
-}
-```
+There is only one emitter that depends on `Event` object defined in the same file. 
+Most of the events are supposed to be Fire-and-forget thing. 
+Events emitted by Use cases are defined in the usecases themselves in the function definitions.
+(Function definition are undergoing...)
 
 ## How to use ?
 
