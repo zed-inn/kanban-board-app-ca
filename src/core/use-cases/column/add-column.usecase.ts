@@ -1,5 +1,5 @@
 import { Column } from "../../entities/column";
-import type { ColumnActionEmitter } from "../../interfaces/emitter/column-action-emitter.interface";
+import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
@@ -13,12 +13,21 @@ export class AddColumn {
     private memberRepo: MemberRepository,
     private columnRepo: ColumnRepository,
     private memberPolicy: MemberPolicy,
-    private columnActionEmit: ColumnActionEmitter,
+    private eventEmitter: EventEmitter,
   ) {}
 
   private nextPosition = async (boardId: string) => {
     const topColumn = await this.columnRepo.getTopInBoard(boardId);
     return topColumn ? topColumn.attrbs.position + this.POSITION_STEP : 0;
+  };
+
+  private emitEvents = async (col: Column, boardId: string, userId: string) => {
+    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    this.eventEmitter.emit({
+      name: "COLUMN_ADDED",
+      detail: col.attrbs,
+      userIds: memberIds.filter((m) => m != userId),
+    });
   };
 
   execute = async (name: string, boardId: string, userId: string) => {
@@ -30,7 +39,6 @@ export class AddColumn {
     const column = new Column({ id: columnId, name, boardId, position });
     await this.columnRepo.save(column);
 
-    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
-    this.columnActionEmit.emitColumnAdded(members, column);
+    this.emitEvents(column, boardId, userId);
   };
 }

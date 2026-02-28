@@ -1,5 +1,6 @@
+import type { Board } from "../../entities/board";
 import { BoardMembership } from "../../entities/board_membership";
-import type { BoardActionEmitter } from "../../interfaces/emitter/board-action-emitter.interface";
+import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
@@ -9,8 +10,17 @@ export class RemoveMember {
     private boardRepo: BoardRepository,
     private memberRepo: MemberRepository,
     private memberPolicy: MemberPolicy,
-    private boardActionEmit: BoardActionEmitter,
+    private eventEmitter: EventEmitter,
   ) {}
+
+  private emitEvents = async (board: Board, userId: string) => {
+    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(board.id);
+    this.eventEmitter.emit({
+      name: "MEMBER_LEFT",
+      detail: { board: board.attrbs, memberId: userId },
+      userIds: memberIds.filter((m) => m != userId),
+    });
+  };
 
   execute = async (boardId: string, memberId: string) => {
     const board = await this.boardRepo.getById(boardId);
@@ -19,7 +29,6 @@ export class RemoveMember {
     const member = new BoardMembership({ boardId: board.id, memberId });
     await this.memberRepo.remove(member);
 
-    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
-    this.boardActionEmit.emitMemberLeft(members, board);
+    this.emitEvents(board, memberId);
   };
 }

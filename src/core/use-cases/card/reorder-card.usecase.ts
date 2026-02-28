@@ -1,5 +1,6 @@
+import type { Card } from "../../entities/card";
 import { CardNotInColumnError } from "../../errors/card.error";
-import type { CardActionEmitter } from "../../interfaces/emitter/card-action-emitter.interface";
+import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { CardPolicy } from "../../interfaces/policy/card-policy.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
@@ -13,8 +14,17 @@ export class ReorderCard {
     private memberPolicy: MemberPolicy,
     private columnPolicy: ColumnPolicy,
     private cardPolicy: CardPolicy,
-    private cardActionEmit: CardActionEmitter,
+    private eventEmiter: EventEmitter,
   ) {}
+
+  private emitEvents = async (card: Card, boardId: string, userId: string) => {
+    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    this.eventEmiter.emit({
+      name: "CARD_RENAMED",
+      detail: card.attrbs,
+      userIds: memberIds.filter((m) => m != userId),
+    });
+  };
 
   execute = async (
     cardId: string,
@@ -42,7 +52,6 @@ export class ReorderCard {
 
     await this.cardRepo.save(card);
 
-    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
-    this.cardActionEmit.emitCardReordered(members, card);
+    this.emitEvents(card, boardId, userId);
   };
 }

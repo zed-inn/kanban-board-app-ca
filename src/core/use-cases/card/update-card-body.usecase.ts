@@ -1,8 +1,9 @@
+import type { Card } from "../../entities/card";
 import {
   CardNotInColumnError,
   ParamsInsufficientCardBodyUpdateError,
 } from "../../errors/card.error";
-import type { CardActionEmitter } from "../../interfaces/emitter/card-action-emitter.interface";
+import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { CardRepository } from "../../interfaces/repo/card-repository.interface";
@@ -14,7 +15,7 @@ export class UpdateCardBody {
     private cardRepo: CardRepository,
     private memberPolicy: MemberPolicy,
     private columnPolicy: ColumnPolicy,
-    private cardActionEmit: CardActionEmitter,
+    private eventEmitter: EventEmitter,
   ) {}
 
   private ensureTitleOrContentGiven = (body: {
@@ -23,6 +24,15 @@ export class UpdateCardBody {
   }) => {
     if (body.title === undefined && body.content === undefined)
       throw new ParamsInsufficientCardBodyUpdateError();
+  };
+
+  private emitEvents = async (card: Card, boardId: string, userId: string) => {
+    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    this.eventEmitter.emit({
+      name: "CARD_REORDERED",
+      detail: card.attrbs,
+      userIds: memberIds.filter((m) => m != userId),
+    });
   };
 
   execute = async (
@@ -43,7 +53,6 @@ export class UpdateCardBody {
 
     await this.cardRepo.save(card);
 
-    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
-    this.cardActionEmit.emitCardBodyUpdated(members, card);
+    this.emitEvents(card, boardId, userId);
   };
 }

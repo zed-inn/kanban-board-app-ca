@@ -1,5 +1,6 @@
+import type { Board } from "../../entities/board";
 import { NotBoardOwnerError } from "../../errors/board.error";
-import type { BoardActionEmitter } from "../../interfaces/emitter/board-action-emitter.interface";
+import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
@@ -9,8 +10,22 @@ export class ChangeOwner {
     private boardRepo: BoardRepository,
     private memberRepo: MemberRepository,
     private memberPolicy: MemberPolicy,
-    private boardActionEmit: BoardActionEmitter,
+    private eventEmitter: EventEmitter,
   ) {}
+
+  private emitEvents = async (board: Board, userId: string) => {
+    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(board.id);
+    this.eventEmitter.emit({
+      name: "BOARD_OWNER_CHANGED",
+      detail: board.attrbs,
+      userIds: memberIds.filter((m) => m !== userId),
+    });
+    this.eventEmitter.emit({
+      name: "BOARD_OWNERSHIP_ACQUIRED",
+      detail: board.attrbs,
+      userIds: [userId],
+    });
+  };
 
   execute = async (boardId: string, ownerId: string, userId: string) => {
     const board = await this.boardRepo.getById(boardId);
@@ -21,8 +36,6 @@ export class ChangeOwner {
 
     await this.boardRepo.save(board);
 
-    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
-    this.boardActionEmit.emitOwnerChange(members, board);
-    this.boardActionEmit.emitOwnershipTransferredToNewOwnerById(userId, board);
+    this.emitEvents(board, userId);
   };
 }

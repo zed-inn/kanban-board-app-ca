@@ -1,5 +1,6 @@
+import type { Card } from "../../entities/card";
 import { CardNotInColumnError } from "../../errors/card.error";
-import type { CardActionEmitter } from "../../interfaces/emitter/card-action-emitter.interface";
+import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { CardRepository } from "../../interfaces/repo/card-repository.interface";
@@ -11,8 +12,17 @@ export class RemoveCard {
     private cardRepo: CardRepository,
     private memberPolicy: MemberPolicy,
     private columnPolicy: ColumnPolicy,
-    private cardActionEmit: CardActionEmitter,
+    private eventEmitter: EventEmitter,
   ) {}
+
+  private emitEvents = async (card: Card, boardId: string, userId: string) => {
+    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    this.eventEmitter.emit({
+      name: "CARD_REMOVED",
+      detail: card.attrbs,
+      userIds: memberIds.filter((m) => m != userId),
+    });
+  };
 
   execute = async (
     cardId: string,
@@ -28,7 +38,6 @@ export class RemoveCard {
 
     await this.cardRepo.remove(card);
 
-    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
-    this.cardActionEmit.emitCardRemoved(members, card);
+    this.emitEvents(card, boardId, userId);
   };
 }

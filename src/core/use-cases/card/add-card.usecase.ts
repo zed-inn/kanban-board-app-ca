@@ -1,5 +1,5 @@
 import { Card } from "../../entities/card";
-import type { CardActionEmitter } from "../../interfaces/emitter/card-action-emitter.interface";
+import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { CardRepository } from "../../interfaces/repo/card-repository.interface";
@@ -15,12 +15,21 @@ export class AddCard {
     private cardRepo: CardRepository,
     private memberPolicy: MemberPolicy,
     private columnPolicy: ColumnPolicy,
-    private cardActionEmit: CardActionEmitter,
+    private eventEmitter: EventEmitter,
   ) {}
 
   private nextPosition = async (columnId: string) => {
     const topCard = await this.cardRepo.getTopInColumn(columnId);
     return topCard ? topCard.attrbs.postition + this.POSITION_STEP : 0;
+  };
+
+  private emitEvents = async (card: Card, boardId: string, userId: string) => {
+    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    this.eventEmitter.emit({
+      name: "CARD_ADDED",
+      detail: card.attrbs,
+      userIds: memberIds.filter((m) => m != userId),
+    });
   };
 
   execute = async (
@@ -39,7 +48,6 @@ export class AddCard {
     const card = new Card({ id: cardId, title, content, position, columnId });
     await this.cardRepo.save(card);
 
-    const members = await this.memberRepo.getAllMembersOfBoardById(boardId);
-    this.cardActionEmit.emitCardAdded(members, card);
+    this.emitEvents(card, boardId, userId);
   };
 }
