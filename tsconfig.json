@@ -21,7 +21,9 @@
     "isolatedModules": true,
 
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    "composite": true
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules"]
