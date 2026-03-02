@@ -3,6 +3,7 @@ export type { CardPolicy } from "./core/interfaces/policy/card-policy.interface"
 export type { ColumnPolicy } from "./core/interfaces/policy/column-policy.interface";
 export type { MemberPolicy } from "./core/interfaces/policy/member-policy.interface";
 export type { BoardRepository } from "./core/interfaces/repo/board-repository.interface";
+export type { UserRepository } from "./core/interfaces/repo/user-repository.interface";
 export type { CardRepository } from "./core/interfaces/repo/card-repository.interface";
 export type { ColumnRepository } from "./core/interfaces/repo/column-repository.interface";
 export type { MemberRepository } from "./core/interfaces/repo/member-repository.interface";
