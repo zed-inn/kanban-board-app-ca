@@ -26,9 +26,22 @@ export class ReorderCard {
     });
   };
 
+  private getInPlaceLocationOf = async (cardId: string) => {
+    const belowCard = await this.cardRepo.getById(cardId);
+    const aboveCard = await this.cardRepo.getTopCardBelowPositionInColumn(
+      belowCard.attrbs.position,
+      belowCard.attrbs.columnId,
+    );
+
+    const belowPosition = belowCard.attrbs.position,
+      abovePosition = aboveCard ? aboveCard.attrbs.position : 0;
+    const position = (belowPosition + abovePosition) / 2;
+    return { position, columnId: belowCard.attrbs.columnId };
+  };
+
   execute = async (
     cardId: string,
-    location: { position: number; columnId?: string },
+    iPOCardId: string, // in place of card id
     columnId: string,
     boardId: string,
     userId: string,
@@ -39,7 +52,15 @@ export class ReorderCard {
     const card = await this.cardRepo.getById(cardId);
     if (card.attrbs.columnId !== columnId) throw new CardNotInColumnError();
 
-    if (location.columnId) {
+    const iPOCard = await this.cardRepo.getById(iPOCardId);
+    await this.columnPolicy.ensureColumnInBoard(
+      iPOCard.attrbs.columnId,
+      boardId,
+    );
+
+    const location = await this.getInPlaceLocationOf(iPOCardId);
+
+    if (location.columnId !== columnId) {
       await this.columnPolicy.ensureColumnInBoard(location.columnId, boardId);
       card.relocateToNewColumn(location.columnId);
     }

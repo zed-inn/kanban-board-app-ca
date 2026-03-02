@@ -24,9 +24,22 @@ export class ReorderColumn {
     });
   };
 
+  private getInPlacePositionOf = async (columnId: string) => {
+    const belowCol = await this.columnRepo.getById(columnId);
+    const aboveCol = await this.columnRepo.getTopColumnBelowPositionInBoard(
+      belowCol.attrbs.position,
+      belowCol.attrbs.boardId,
+    );
+
+    const belowPosition = belowCol.attrbs.position,
+      abovePosition = aboveCol ? aboveCol.attrbs.position : 0;
+    const position = (belowPosition + abovePosition) / 2;
+    return position;
+  };
+
   execute = async (
     columnId: string,
-    position: number,
+    iPOColumnId: string, // in place of column id
     boardId: string,
     userId: string,
   ) => {
@@ -35,7 +48,9 @@ export class ReorderColumn {
     const column = await this.columnRepo.getById(columnId);
     if (column.attrbs.boardId !== boardId) throw new ColumnNotInBoardError();
 
-    await this.columnPolicy.ensureEmptyPositionInBoard(position, boardId);
+    await this.columnPolicy.ensureColumnInBoard(iPOColumnId, boardId);
+
+    const position = await this.getInPlacePositionOf(iPOColumnId);
     column.moveTo(position);
 
     await this.columnRepo.save(column);
