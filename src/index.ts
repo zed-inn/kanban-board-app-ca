@@ -1,3 +1,10 @@
+// Entities
+export { Board } from "./core/entities/board";
+export { BoardMembership } from "./core/entities/board_membership";
+export { Card } from "./core/entities/card";
+export { Column } from "./core/entities/column";
+export { User } from "./core/entities/user";
+
 // Interfaces
 export type { EventEmitter } from "./core/interfaces/emitter/event-emitter.interface";
 export type { CardPolicy } from "./core/interfaces/policy/card-policy.interface";
