@@ -16,7 +16,7 @@ export class CreateBoard {
   execute = async (name: string, userId: string) => {
     const boardId = await this.idGen.generateUnique();
 
-    await this.uow.withTransaction(async () => {
+    await this.uow.atomic(async () => {
       const board = new Board({ id: boardId, name, ownerId: userId });
       await this.boardRepo.save(board);
 

@@ -31,7 +31,7 @@ export class DeleteBoard {
 
     const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
 
-    await this.uow.withTransaction(async () => {
+    await this.uow.atomic(async () => {
       await this.boardRepo.remove(board);
       await this.memberRepo.removeAllBoardMembers(board);
     });
