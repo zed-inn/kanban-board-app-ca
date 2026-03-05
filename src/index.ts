@@ -37,3 +37,22 @@ export { GetBoardColumns } from "./core/use-cases/column/get-board-columns.useca
 export { RemoveColumn } from "./core/use-cases/column/remove-column.usecase";
 export { RenameColumn } from "./core/use-cases/column/rename-column.usecase";
 export { ReorderColumn } from "./core/use-cases/column/reorder-column.usecase";
+
+// Errors
+export {
+  NoBoardError,
+  NotBoardMemberError,
+  NotBoardOwnerError,
+} from "./core/errors/board.error";
+export {
+  CardNotInColumnError,
+  InvalidCardPositionError,
+  NoCardError,
+  ParamsInsufficientCardBodyUpdateError,
+} from "./core/errors/card.error";
+export {
+  ColumnNotInBoardError,
+  InvalidColumnPositionError,
+  NoColumnError,
+} from "./core/errors/column.error";
+export { NoUserError } from "./core/errors/user.error";
