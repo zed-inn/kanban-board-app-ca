@@ -3,44 +3,48 @@
 ## Entities :
 
 - User
-    - Contains private `_id`
-    - Has no methods
+  - Contains private `_id`
+  - Has no methods
 
 - Board
-    - Contains private `_id`, `name`, `ownerId`
-    - Has methods `rename`, `transferOwnershipTo`
+  - Contains private `_id`, `name`, `ownerId`
+  - Has methods `rename`, `transferOwnershipTo`
 
 - Board Membership
-    - Contains private `boardId`, `memberId`
-    - Has no methods
+  - Contains private `boardId`, `memberId`
+  - Has no methods
 
 - Column
-    - Contains private `_id`, `name`, `position`, `boardId`
-    - Has methods `rename`, `moveTo`
+  - Contains private `_id`, `name`, `position`, `boardId`
+  - Has methods `rename`, `moveTo`
 
 - Card
-    - Contains private `_id`, `title`, `content`, `position`, `columnId`
-    - Has methods `updateBody`, `moveTo`, `relocateToNewColumn`
+  - Contains private `_id`, `title`, `content`, `position`, `columnId`
+  - Has methods `updateBody`, `moveTo`, `relocateToNewColumn`
 
 ## Use cases
 
 ### Board
+
 - Create Board
 - Delete Board
 - Change Owner
 - Rename Board
 
 ### Board Membership
+
 - Add Member
 - Remove Member
 
 ### Column
+
 - Add Column
 - Remove Column
 - Rename Column
 - Reorder Column
 
 ### Card
+
 - Add Card
 - Remove Card
 - Update Card Body
@@ -49,7 +53,9 @@
 ## Interfaces / Ports
 
 ### Repository
+
 - Board Repository
+
 ```ts
 interface BoardRepository {
   getById(id: string): Promise<Board>;
@@ -59,6 +65,7 @@ interface BoardRepository {
 ```
 
 - Member Repository
+
 ```ts
 interface MemberRepository {
   exists(membership: BoardMembership): Promise<boolean>;
@@ -70,6 +77,7 @@ interface MemberRepository {
 ```
 
 - Column Repository
+
 ```ts
 interface ColumnRepository {
   getById(id: string): Promise<Column>;
@@ -80,6 +88,7 @@ interface ColumnRepository {
 ```
 
 - Card Repository
+
 ```ts
 interface CardRepository {
   getById(id: string): Promise<Card>;
@@ -90,7 +99,9 @@ interface CardRepository {
 ```
 
 ### Policy
+
 - Member Policy
+
 ```ts
 interface MemberPolicy {
   ensureOwner(boardId: string, ownerId: string): Promise<void>;
@@ -99,6 +110,7 @@ interface MemberPolicy {
 ```
 
 - Column Policy
+
 ```ts
 interface ColumnPolicy {
   ensureColumnInBoard(columnId: string, boardId: string): Promise<void>;
@@ -107,6 +119,7 @@ interface ColumnPolicy {
 ```
 
 - Card Policy
+
 ```ts
 interface CardPolicy {
   ensureEmptyPositionInColumn(
@@ -117,7 +130,9 @@ interface CardPolicy {
 ```
 
 ### Utils
+
 - Unit Of Work
+
 ```ts
 interface UnitOfWork {
   withTransaction<T>(work: () => Promise<T>): Promise<T>;
@@ -125,6 +140,7 @@ interface UnitOfWork {
 ```
 
 - Id Generator
+
 ```ts
 export interface IdGenerator {
   generateUnique(): Promise<string>;
@@ -132,8 +148,9 @@ export interface IdGenerator {
 ```
 
 ### Emitter
-There is only one emitter that depends on `Event` object defined in the same file. 
-Most of the events are supposed to be Fire-and-forget thing. 
+
+There is only one emitter that depends on `Event` object defined in the same file.
+Most of the events are supposed to be Fire-and-forget thing.
 Events emitted by Use cases are defined in the usecases themselves in the function definitions.
 (Function definition are undergoing...)
 
@@ -145,6 +162,7 @@ The `Application` requires all the ports to be supplied to it. No default ports 
 Each interface/port must be implemented and supplied otherwise the application will not work correctly. \
 
 The `Application` provides each use case to be used independently, for ex.
+
 ```ts
 
 const app = new Application(idgen, memberRepo, ...);
@@ -152,3 +170,16 @@ app.renameBoard.execute(...arguments for renaming board required.);
 
 ```
 
+# Current Issues
+
+## Ordering issue in Column
+
+When columns are reordered, it becomes problematic and no change in position (visible) when going from a higher
+position to lower position or when going to one position to just above or below or when going from last position
+to front or vice versa.
+
+## Ordering issue in Card
+
+Same issue as in column in position. \
+There is also an issue that it required `id` to be repositioned but what if the other column has no card then there
+is no option to give `columnId` instead of `id`.
