@@ -1,5 +1,6 @@
 import type { Board } from "../../entities/board";
 import { BoardMembership } from "../../entities/board_membership";
+import { IsBoardOwnerError } from "../../errors/board.error";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
@@ -24,6 +25,8 @@ export class RemoveMember {
 
   execute = async (boardId: string, memberId: string) => {
     const board = await this.boardRepo.getById(boardId);
+    if (board.attrbs.ownerId === memberId) throw new IsBoardOwnerError();
+
     await this.memberPolicy.ensureMember(memberId, board.id);
 
     const member = new BoardMembership({ boardId: board.id, memberId });

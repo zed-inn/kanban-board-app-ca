@@ -13,3 +13,7 @@ export class NotBoardMemberError extends Error {
 export class IsBoardMemberError extends Error {
   override message: string = "IS_BOARD_MEMBER";
 }
+
+export class IsBoardOwnerError extends Error {
+  override message: string = "IS_BOARD_OWNER";
+}
