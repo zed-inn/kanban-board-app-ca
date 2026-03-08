@@ -1,5 +1,6 @@
 import type { Column } from "../../entities/column";
 import { ColumnNotInBoardError } from "../../errors/column.error";
+import type { ColumnConstants } from "../../interfaces/constants/column.constant";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
@@ -8,6 +9,7 @@ import type { MemberRepository } from "../../interfaces/repo/member-repository.i
 
 export class ReorderColumn {
   constructor(
+    private columnConstant: ColumnConstants,
     private memberRepo: MemberRepository,
     private columnRepo: ColumnRepository,
     private memberPolicy: MemberPolicy,
@@ -24,17 +26,29 @@ export class ReorderColumn {
     });
   };
 
-  private getInPlacePositionOf = async (columnId: string) => {
-    const belowCol = await this.columnRepo.getById(columnId);
-    const aboveCol = await this.columnRepo.getTopColumnBelowPositionInBoard(
-      belowCol.attrbs.position,
-      belowCol.attrbs.boardId,
+  private getBelowPosition = async (position: number, boardId: string) => {
+    const belowColumn = await this.columnRepo.getTopColumnBelowPositionInBoard(
+      position,
+      boardId,
     );
 
-    const belowPosition = belowCol.attrbs.position,
-      abovePosition = aboveCol ? aboveCol.attrbs.position : 0;
-    const position = (belowPosition + abovePosition) / 2;
-    return position;
+    const newPos = belowColumn
+      ? (position + belowColumn.attrbs.position) / 2
+      : position + this.columnConstant.POSITION_GAP;
+    return newPos;
+  };
+
+  private getAbovePosition = async (position: number, boardId: string) => {
+    const aboveColumn =
+      await this.columnRepo.getBottomColumnAbovePositionInBoard(
+        position,
+        boardId,
+      );
+
+    const newPos = aboveColumn
+      ? (position + aboveColumn.attrbs.position) / 2
+      : position + this.columnConstant.POSITION_GAP;
+    return newPos;
   };
 
   execute = async (
@@ -48,11 +62,16 @@ export class ReorderColumn {
     const column = await this.columnRepo.getById(columnId);
     if (column.attrbs.boardId !== boardId) throw new ColumnNotInBoardError();
 
-    await this.columnPolicy.ensureColumnInBoard(iPOColumnId, boardId);
+    const ipoColumn = await this.columnRepo.getById(iPOColumnId);
+    if (ipoColumn.attrbs.boardId !== boardId) throw new ColumnNotInBoardError();
 
-    const position = await this.getInPlacePositionOf(iPOColumnId);
+    const position = await (
+      ipoColumn.attrbs.position < column.attrbs.position
+        ? this.getBelowPosition
+        : this.getAbovePosition
+    )(ipoColumn.attrbs.position, boardId);
+
     column.moveTo(position);
-
     await this.columnRepo.save(column);
 
     this.emitEvents(column, boardId, userId);

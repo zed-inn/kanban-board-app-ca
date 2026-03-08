@@ -8,6 +8,10 @@ export interface ColumnRepository {
     position: number,
     boardId: string,
   ): Promise<Column | null>;
+  getBottomColumnAbovePositionInBoard(
+    position: number,
+    boardId: string,
+  ): Promise<Column | null>;
   remove(column: Column): Promise<void>;
   save(column: Column): Promise<void>;
 }
