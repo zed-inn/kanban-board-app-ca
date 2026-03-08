@@ -5,7 +5,6 @@ import {
 } from "../../errors/card.error";
 import type { CardConstant } from "../../interfaces/constants/card.constant";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
-import type { CardPolicy } from "../../interfaces/policy/card-policy.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { CardRepository } from "../../interfaces/repo/card-repository.interface";
