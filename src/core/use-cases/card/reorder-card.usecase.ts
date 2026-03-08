@@ -1,5 +1,9 @@
 import type { Card } from "../../entities/card";
-import { CardNotInColumnError } from "../../errors/card.error";
+import {
+  CardNotInColumnError,
+  ParamsInsufficientCardReorderError,
+} from "../../errors/card.error";
+import type { CardConstant } from "../../interfaces/constants/card.constant";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { CardPolicy } from "../../interfaces/policy/card-policy.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
@@ -9,11 +13,11 @@ import type { MemberRepository } from "../../interfaces/repo/member-repository.i
 
 export class ReorderCard {
   constructor(
+    private cardConstant: CardConstant,
     private memberRepo: MemberRepository,
     private cardRepo: CardRepository,
     private memberPolicy: MemberPolicy,
     private columnPolicy: ColumnPolicy,
-    private cardPolicy: CardPolicy,
     private eventEmiter: EventEmitter,
   ) {}
 
@@ -26,22 +30,33 @@ export class ReorderCard {
     });
   };
 
-  private getInPlaceLocationOf = async (cardId: string) => {
-    const belowCard = await this.cardRepo.getById(cardId);
-    const aboveCard = await this.cardRepo.getTopCardBelowPositionInColumn(
-      belowCard.attrbs.position,
-      belowCard.attrbs.columnId,
+  private getBelowPosition = async (position: number, columnId: string) => {
+    const belowCard = await this.cardRepo.getTopCardBelowPositionInColumn(
+      position,
+      columnId,
     );
 
-    const belowPosition = belowCard.attrbs.position,
-      abovePosition = aboveCard ? aboveCard.attrbs.position : 0;
-    const position = (belowPosition + abovePosition) / 2;
-    return { position, columnId: belowCard.attrbs.columnId };
+    const newPos = belowCard
+      ? (position + belowCard.attrbs.position) / 2
+      : position + this.cardConstant.POSITION_GAP;
+    return newPos;
+  };
+
+  private getAbovePosition = async (position: number, columnId: string) => {
+    const aboveCard = await this.cardRepo.getBottomCardAbovePositionInColumn(
+      position,
+      columnId,
+    );
+
+    const newPos = aboveCard
+      ? (position + aboveCard.attrbs.position) / 2
+      : position + this.cardConstant.POSITION_GAP;
+    return newPos;
   };
 
   execute = async (
     cardId: string,
-    iPOCardId: string, // in place of card id
+    location: { columnId?: string; iPOCardId?: string }, // in place of card id
     columnId: string,
     boardId: string,
     userId: string,
@@ -52,27 +67,36 @@ export class ReorderCard {
     const card = await this.cardRepo.getById(cardId);
     if (card.attrbs.columnId !== columnId) throw new CardNotInColumnError();
 
-    const iPOCard = await this.cardRepo.getById(iPOCardId);
-    await this.columnPolicy.ensureColumnInBoard(
-      iPOCard.attrbs.columnId,
-      boardId,
-    );
+    if (location.iPOCardId) {
+      const iPOCard = await this.cardRepo.getById(location.iPOCardId);
+      await this.columnPolicy.ensureColumnInBoard(
+        iPOCard.attrbs.columnId,
+        boardId,
+      );
 
-    const location = await this.getInPlaceLocationOf(iPOCardId);
+      const position = await (
+        iPOCard.attrbs.columnId !== card.attrbs.columnId ||
+          iPOCard.attrbs.position > card.attrbs.position
+          ? this.getAbovePosition
+          : this.getBelowPosition
+      )(iPOCard.attrbs.position, iPOCard.attrbs.columnId);
 
-    if (location.columnId !== columnId) {
-      await this.columnPolicy.ensureColumnInBoard(location.columnId, boardId);
+      card.relocateToNewColumn(iPOCard.attrbs.columnId);
+      card.moveTo(position);
+      this.cardRepo.save(card);
+
+      this.emitEvents(card, boardId, userId);
+    } else if (location.columnId) {
+      const topCard = await this.cardRepo.getTopInColumn(location.columnId);
+      const position = topCard
+        ? topCard.attrbs.position + this.cardConstant.POSITION_GAP
+        : 0;
+
       card.relocateToNewColumn(location.columnId);
-    }
+      card.moveTo(position);
+      this.cardRepo.save(card);
 
-    await this.cardPolicy.ensureEmptyPositionInColumn(
-      location.position,
-      columnId,
-    );
-    card.moveTo(location.position);
-
-    await this.cardRepo.save(card);
-
-    this.emitEvents(card, boardId, userId);
+      this.emitEvents(card, boardId, userId);
+    } else throw new ParamsInsufficientCardReorderError();
   };
 }

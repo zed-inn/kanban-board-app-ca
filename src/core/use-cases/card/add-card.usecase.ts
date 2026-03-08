@@ -1,4 +1,5 @@
 import { Card } from "../../entities/card";
+import type { CardConstant } from "../../interfaces/constants/card.constant";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
@@ -7,10 +8,9 @@ import type { MemberRepository } from "../../interfaces/repo/member-repository.i
 import type { IdGenerator } from "../../interfaces/utils/id-generator.interface";
 
 export class AddCard {
-  private readonly POSITION_STEP = 100;
-
   constructor(
     private idGen: IdGenerator,
+    private cardConstant: CardConstant,
     private memberRepo: MemberRepository,
     private cardRepo: CardRepository,
     private memberPolicy: MemberPolicy,
@@ -20,7 +20,9 @@ export class AddCard {
 
   private nextPosition = async (columnId: string) => {
     const topCard = await this.cardRepo.getTopInColumn(columnId);
-    return topCard ? topCard.attrbs.position + this.POSITION_STEP : 0;
+    return topCard
+      ? topCard.attrbs.position + this.cardConstant.POSITION_GAP
+      : 0;
   };
 
   private emitEvents = async (card: Card, boardId: string, userId: string) => {

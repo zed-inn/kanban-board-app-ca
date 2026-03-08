@@ -13,3 +13,7 @@ export class InvalidCardPositionError extends Error {
 export class ParamsInsufficientCardBodyUpdateError extends Error {
   override message: string = "PARAMS_INSUFFICIENT_CARD_BODY_UPDATE";
 }
+
+export class ParamsInsufficientCardReorderError extends Error {
+  override message: string = "PARAMS_INSUFFICIENT_CARD_REORDER";
+}

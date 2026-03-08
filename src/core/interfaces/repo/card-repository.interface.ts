@@ -8,6 +8,10 @@ export interface CardRepository {
     position: number,
     columnId: string,
   ): Promise<Card | null>;
+  getBottomCardAbovePositionInColumn(
+    position: number,
+    columnId: string,
+  ): Promise<Card | null>;
   remove(card: Card): Promise<void>;
   save(card: Card): Promise<void>;
 }
