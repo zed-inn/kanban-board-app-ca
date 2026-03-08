@@ -52,12 +52,32 @@
 
 ## Interfaces / Ports
 
+### Constants
+
+- Column Constant
+
+```ts
+export interface ColumnConstants {
+  POSITION_GAP: number;
+}
+```
+
+- Card Constant
+
+```ts
+export interface CardConstant {
+  POSITION_GAP: number;
+}
+```
+
 ### Repository
 
 - Board Repository
 
 ```ts
 interface BoardRepository {
+  getByOwnerId(userId: string): Promise<Board[]>;
+  getByIds(ids: string[]): Promise<Board[]>;
   getById(id: string): Promise<Board>;
   save(board: Board): Promise<void>;
   remove(board: Board): Promise<void>;
@@ -69,6 +89,7 @@ interface BoardRepository {
 ```ts
 interface MemberRepository {
   exists(membership: BoardMembership): Promise<boolean>;
+  getByUserId(userId: string): Promise<BoardMembership[]>;
   getAllBoardMemberIdsById(boardId: string): Promise<string[]>;
   removeAllBoardMembers(board: Board): Promise<void>;
   remove(membership: BoardMembership): Promise<void>;
@@ -80,8 +101,17 @@ interface MemberRepository {
 
 ```ts
 interface ColumnRepository {
+  getByBoardId(boardId: string): Promise<Column[]>;
   getById(id: string): Promise<Column>;
   getTopInBoard(boardId: string): Promise<Column | null>;
+  getTopColumnBelowPositionInBoard(
+    position: number,
+    boardId: string,
+  ): Promise<Column | null>;
+  getBottomColumnAbovePositionInBoard(
+    position: number,
+    boardId: string,
+  ): Promise<Column | null>;
   remove(column: Column): Promise<void>;
   save(column: Column): Promise<void>;
 }
@@ -91,8 +121,17 @@ interface ColumnRepository {
 
 ```ts
 interface CardRepository {
+  getByColumnId(columnId: string): Promise<Card[]>;
   getById(id: string): Promise<Card>;
   getTopInColumn(columnId: string): Promise<Card | null>;
+  getTopCardBelowPositionInColumn(
+    position: number,
+    columnId: string,
+  ): Promise<Card | null>;
+  getBottomCardAbovePositionInColumn(
+    position: number,
+    columnId: string,
+  ): Promise<Card | null>;
   remove(card: Card): Promise<void>;
   save(card: Card): Promise<void>;
 }
@@ -126,6 +165,7 @@ interface CardPolicy {
     position: number,
     columnId: string,
   ): Promise<void>;
+  ensureCardInColumn(id: string, columnId: string): Promise<void>;
 }
 ```
 
@@ -135,7 +175,7 @@ interface CardPolicy {
 
 ```ts
 interface UnitOfWork {
-  withTransaction<T>(work: () => Promise<T>): Promise<T>;
+  atomic<T>(work: () => Promise<T>): Promise<T>;
 }
 ```
 
@@ -156,30 +196,29 @@ Events emitted by Use cases are defined in the usecases themselves in the functi
 
 ## How to use ?
 
-The module gives and `Application` class which can be imported.
+The module exports all the interface and usecases class which can be imported in the infra.
 
-The `Application` requires all the ports to be supplied to it. No default ports are available.
-Each interface/port must be implemented and supplied otherwise the application will not work correctly. \
+Each interface can be implemented in desired way. \
+For each use case, a new instance of that use case and new instances of all the interface required in necessary for desired results. \
 
-The `Application` provides each use case to be used independently, for ex.
+for ex.
 
 ```ts
+const idGenerator = new UUIDGenerator();
+const memberRepo = new PostgresBoardMemberRepository(db, {});
+const cardRepo = new PostgresCardRepository(db, {});
+const memberPolicy = new PostgresBoardMemberPolicy(db);
+const columnPolicy = new PostgresColumnPolicy(db);
+const eventEmitter = new IoEventEmitter(io);
 
-const app = new Application(idgen, memberRepo, ...);
-app.renameBoard.execute(...arguments for renaming board required.);
-
+const addCard = new AddCard(
+  idGenerator,
+  cardRepo,
+  memberRepo,
+  cardRepo,
+  memberPolicy,
+  columnPolicy,
+  eventEmitter,
+);
+await addCard.execute(b.title, b.content, p.columnId, p.boardId, user.id);
 ```
-
-# Current Issues
-
-## Ordering issue in Column
-
-When columns are reordered, it becomes problematic and no change in position (visible) when going from a higher
-position to lower position or when going to one position to just above or below or when going from last position
-to front or vice versa.
-
-## Ordering issue in Card
-
-Same issue as in column in position. \
-There is also an issue that it required `id` to be repositioned but what if the other column has no card then there
-is no option to give `columnId` instead of `id`.
