@@ -1,9 +1,74 @@
+import { EntityValidationError } from "../errors/entity-validation.error";
+
 export class Card {
-  private _id: string;
+  private readonly _id: string;
   private title: string;
   private content: string | null;
   private position: string;
   private columnId: string;
+
+  private static readonly validate = {
+    id: (id: string): string => {
+      if (typeof id !== "string")
+        throw new EntityValidationError(
+          "INVALID_TYPE_CARD_ID",
+          "Card id must be a string.",
+        );
+      if ((id = id.trim()).length < 1)
+        throw new EntityValidationError(
+          "EMPTY_CARD_ID",
+          "Card id cannot be empty.",
+        );
+      return id;
+    },
+    title: (title: string): string => {
+      if (typeof title !== "string")
+        throw new EntityValidationError(
+          "INVALID_TYPE_CARD_TITLE",
+          "Card title must be a string.",
+        );
+      if ((title = title.trim()).length < 1)
+        throw new EntityValidationError(
+          "EMPTY_CARD_TITLE",
+          "Card title cannot be empty.",
+        );
+      return title;
+    },
+    content: (content: string | null): string | null => {
+      if (content !== null && typeof content !== "string")
+        throw new EntityValidationError(
+          "INVALID_TYPE_CARD_CONTENT",
+          "Card content must be a string or null.",
+        );
+      return content === null ? null : content.trim();
+    },
+    position: (pos: string): string => {
+      if (typeof pos !== "string")
+        throw new EntityValidationError(
+          "INVALID_TYPE_CARD_POSITION",
+          "Card position must be a string.",
+        );
+      if ((pos = pos.trim()).length < 1)
+        throw new EntityValidationError(
+          "EMPTY_CARD_POSITION",
+          "Card position cannot be empty.",
+        );
+      return pos;
+    },
+    columnId: (id: string): string => {
+      if (typeof id !== "string")
+        throw new EntityValidationError(
+          "INVALID_TYPE_COLUMN_ID",
+          "Column id must be a string.",
+        );
+      if ((id = id.trim()).length < 1)
+        throw new EntityValidationError(
+          "EMPTY_COLUMN_ID",
+          "Column id cannot be empty.",
+        );
+      return id;
+    },
+  };
 
   constructor(params: {
     id: string;
@@ -12,42 +77,14 @@ export class Card {
     position: string;
     columnId: string;
   }) {
-    if (typeof params.id !== "string") throw new Error("Invalid card id.");
-    params.id = params.id.trim();
-    if (params.id.length < 1) throw new Error("Card Id cannot be empty.");
-
-    this._id = params.id;
-
-    if (typeof params.title !== "string")
-      throw new Error("Invalid card title.");
-    params.title = params.title.trim();
-    if (params.title.length < 1) throw new Error("Card title cannot be empty.");
-
-    this.title = params.title;
-
-    if (!(typeof params.content === "string" || params.content === null))
-      throw new Error("Invalid card content.");
-
-    this.content = params.content?.trim() ?? null;
-
-    if (typeof params.position !== "string")
-      throw new Error("Invalid card position.");
-    params.position = params.position.trim();
-    if (params.position.length < 1)
-      throw new Error("Card position cannot be empty.");
-
-    this.position = params.position;
-
-    if (typeof params.columnId !== "string")
-      throw new Error("Invalid column id.");
-    params.columnId = params.columnId.trim();
-    if (params.columnId.length < 1)
-      throw new Error("Column Id cannot be empty.");
-
-    this.columnId = params.columnId;
+    this._id = Card.validate.id(params.id);
+    this.title = Card.validate.title(params.title);
+    this.content = Card.validate.content(params.content);
+    this.position = Card.validate.position(params.position);
+    this.columnId = Card.validate.columnId(params.columnId);
   }
 
-  public get attrbs() {
+  public get data() {
     return {
       id: this._id,
       title: this.title,
@@ -56,43 +93,25 @@ export class Card {
       columnId: this.columnId,
     };
   }
-
   public get id() {
     return this._id;
   }
 
-  public updateBody = (params: { title?: string; content?: string | null }) => {
-    if (params.title !== undefined) {
-      if (typeof params.title !== "string")
-        throw new Error("Invalid card title.");
-      params.title = params.title.trim();
-      if (params.title.length < 1)
-        throw new Error("Card title cannot be empty.");
-
-      this.title = params.title;
-    }
-
-    if (params.content !== undefined) {
-      if (!(typeof params.content === "string" || params.content === null))
-        throw new Error("Invalid card content.");
-
-      this.content = params.content?.trim() ?? null;
-    }
+  public readonly updateBody = (params: {
+    title?: string;
+    content?: string | null;
+  }) => {
+    if (params.title !== undefined)
+      this.title = Card.validate.title(params.title);
+    if (params.content !== undefined)
+      this.content = Card.validate.content(params.content);
   };
 
-  public moveTo = (position: string) => {
-    if (typeof position !== "string") throw new Error("Invalid card position.");
-    position = position.trim();
-    if (position.length < 1) throw new Error("Card position cannot be empty.");
-
-    this.position = position;
+  public readonly moveTo = (position: string) => {
+    this.position = Card.validate.position(position);
   };
 
-  public relocateToNewColumn = (columnId: string) => {
-    if (typeof columnId !== "string") throw new Error("Invalid column id.");
-    columnId = columnId.trim();
-    if (columnId.length < 1) throw new Error("Column Id cannot be empty.");
-
-    this.columnId = columnId;
+  public readonly relocateToNewColumn = (columnId: string) => {
+    this.columnId = Card.validate.columnId(columnId);
   };
 }

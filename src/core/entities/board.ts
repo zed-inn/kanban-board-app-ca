@@ -1,53 +1,76 @@
+import { EntityValidationError } from "../errors/entity-validation.error";
+
 export class Board {
-  private _id: string;
+  private readonly _id: string;
   private name: string;
   private ownerId: string;
 
+  private static readonly validate = {
+    id: (id: string): string => {
+      if (typeof id !== "string")
+        throw new EntityValidationError(
+          "INVALID_TYPE_BOARD_ID",
+          "Board id must be a string.",
+        );
+      if ((id = id.trim()).length < 1)
+        throw new EntityValidationError(
+          "EMPTY_BOARD_ID",
+          "Board id cannot be empty.",
+        );
+      return id;
+    },
+    name: (name: string): string => {
+      if (typeof name !== "string")
+        throw new EntityValidationError(
+          "INVALID_TYPE_BOARD_NAME",
+          "Board name must be a string.",
+        );
+      if ((name = name.trim()).length < 1)
+        throw new EntityValidationError(
+          "EMPTY_BOARD_NAME",
+          "Board name cannot be empty.",
+        );
+      return name;
+    },
+    ownerId: (ownerId: string): string => {
+      if (typeof ownerId !== "string")
+        throw new EntityValidationError(
+          "INVALID_TYPE_OWNER_ID",
+          "Owner id must be a string.",
+        );
+      if ((ownerId = ownerId.trim()).length < 1)
+        throw new EntityValidationError(
+          "EMPTY_OWNER_ID",
+          "Owner id cannot be empty.",
+        );
+      return ownerId;
+    },
+  };
+
   constructor(params: { id: string; name: string; ownerId: string }) {
-    if (typeof params.id !== "string") throw new Error("Invalid board id.");
-    params.id = params.id.trim();
-    if (params.id.length < 1) throw new Error("Board Id cannot be empty.");
-
-    this._id = params.id;
-
-    if (typeof params.name !== "string") throw new Error("Invalid board name.");
-    params.name = params.name.trim();
-    if (params.name.length < 1) throw new Error("Board name cannot be empty.");
-
-    this.name = params.name;
-
-    if (typeof params.ownerId !== "string")
-      throw new Error("Invalid owner id.");
-    params.ownerId = params.ownerId.trim();
-    if (params.ownerId.length < 1) throw new Error("Owner id cannot be empty.");
-
-    this.ownerId = params.ownerId;
+    this._id = Board.validate.id(params.id);
+    this.name = Board.validate.name(params.name);
+    this.ownerId = Board.validate.ownerId(params.ownerId);
   }
 
-  public get attrbs() {
+  public get data() {
     return { id: this._id, name: this.name, ownerId: this.ownerId };
   }
-
   public get id() {
     return this._id;
   }
 
-  public rename = (name: string) => {
-    if (typeof name !== "string") throw new Error("Invalid board name.");
-    name = name.trim();
-    if (name.length < 1) throw new Error("Board name cannot be empty.");
-
-    this.name = name;
+  public readonly rename = (name: string) => {
+    this.name = Board.validate.name(name);
   };
 
-  public transferOwnershipTo = (ownerId: string) => {
-    if (typeof ownerId !== "string") throw new Error("Invalid owner id.");
-    ownerId = ownerId.trim();
-    if (ownerId.length < 1) throw new Error("Owner id cannot be empty.");
-
-    if (ownerId === this.ownerId)
-      throw new Error("Ownership transfer to self is not allowed.");
-
-    this.ownerId = ownerId;
+  public readonly transferOwnershipTo = (ownerId: string) => {
+    const validOwnerId = Board.validate.ownerId(ownerId);
+    if (validOwnerId === this.ownerId)
+      throw new EntityValidationError(
+        "TRANSFER_TO_SELF",
+        "Ownership transfer to self is not allowed.",
+      );
+    this.ownerId = validOwnerId;
   };
 }
