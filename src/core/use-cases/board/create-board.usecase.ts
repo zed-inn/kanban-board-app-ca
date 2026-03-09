@@ -14,7 +14,7 @@ export class CreateBoard {
   ) {}
 
   execute = async (name: string, userId: string) => {
-    const boardId = await this.idGen.generateUnique();
+    const boardId = await this.idGen.generate();
     const board = new Board({ id: boardId, name, ownerId: userId });
     const member = new BoardMembership({ boardId, memberId: userId });
 

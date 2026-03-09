@@ -29,7 +29,7 @@ export class AddCard {
     if (!(await this.columnRepo.isColumnInBoard(columnId, boardId)))
       throw new ColumnNotInBoardError();
 
-    const cardId = await this.idGen.generateUnique();
+    const cardId = await this.idGen.generate();
     const topCard = await this.cardRepo.getTopInColumn(columnId);
 
     const position = topCard

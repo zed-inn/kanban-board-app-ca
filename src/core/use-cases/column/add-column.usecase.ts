@@ -17,7 +17,7 @@ export class AddColumn {
 
   execute = async (name: string, boardId: string, userId: string) => {
     await this.boardAccess.ensureMember(userId, boardId);
-    const columnId = await this.idGen.generateUnique();
+    const columnId = await this.idGen.generate();
     const topColumn = await this.columnRepo.getTopInBoard(boardId);
 
     const position = topColumn
