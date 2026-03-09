@@ -5,11 +5,11 @@ export interface CardRepository {
   getById(id: string): Promise<Card>;
   getTopInColumn(columnId: string): Promise<Card | null>;
   getTopCardBelowPositionInColumn(
-    position: number,
+    position: string,
     columnId: string,
   ): Promise<Card | null>;
   getBottomCardAbovePositionInColumn(
-    position: number,
+    position: string,
     columnId: string,
   ): Promise<Card | null>;
   remove(card: Card): Promise<void>;

@@ -2,14 +2,14 @@ export class Card {
   private _id: string;
   private title: string;
   private content: string | null;
-  private position: number;
+  private position: string;
   private columnId: string;
 
   constructor(params: {
     id: string;
     title: string;
     content: string | null;
-    position: number;
+    position: string;
     columnId: string;
   }) {
     if (typeof params.id !== "string") throw new Error("Invalid card id.");
@@ -30,8 +30,11 @@ export class Card {
 
     this.content = params.content?.trim() ?? null;
 
-    if (typeof params.position !== "number")
+    if (typeof params.position !== "string")
       throw new Error("Invalid card position.");
+    params.position = params.position.trim();
+    if (params.position.length < 1)
+      throw new Error("Card position cannot be empty.");
 
     this.position = params.position;
 
@@ -77,8 +80,11 @@ export class Card {
     }
   };
 
-  public moveTo = (position: number) => {
-    if (typeof position !== "number") throw new Error("Invalid card position.");
+  public moveTo = (position: string) => {
+    if (typeof position !== "string") throw new Error("Invalid card position.");
+    position = position.trim();
+    if (position.length < 1) throw new Error("Card position cannot be empty.");
+
     this.position = position;
   };
 

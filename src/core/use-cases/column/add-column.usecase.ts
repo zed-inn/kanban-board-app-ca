@@ -1,15 +1,14 @@
 import { Column } from "../../entities/column";
-import type { ColumnConstants } from "../../interfaces/constants/column.constant";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 import type { IdGenerator } from "../../interfaces/utils/id-generator.interface";
+import { LexoRank } from "../../services/lexorank.service";
 
 export class AddColumn {
   constructor(
     private idGen: IdGenerator,
-    private columnConstant: ColumnConstants,
     private memberRepo: MemberRepository,
     private columnRepo: ColumnRepository,
     private memberPolicy: MemberPolicy,
@@ -19,8 +18,8 @@ export class AddColumn {
   private nextPosition = async (boardId: string) => {
     const topColumn = await this.columnRepo.getTopInBoard(boardId);
     return topColumn
-      ? topColumn.attrbs.position + this.columnConstant.POSITION_GAP
-      : 0;
+      ? LexoRank.average(topColumn.attrbs.position, LexoRank.max)
+      : LexoRank.average(LexoRank.min, LexoRank.max);
   };
 
   private emitEvents = async (col: Column, boardId: string, userId: string) => {

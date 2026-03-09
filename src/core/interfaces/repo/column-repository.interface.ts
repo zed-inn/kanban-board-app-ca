@@ -5,11 +5,11 @@ export interface ColumnRepository {
   getById(id: string): Promise<Column>;
   getTopInBoard(boardId: string): Promise<Column | null>;
   getTopColumnBelowPositionInBoard(
-    position: number,
+    position: string,
     boardId: string,
   ): Promise<Column | null>;
   getBottomColumnAbovePositionInBoard(
-    position: number,
+    position: string,
     boardId: string,
   ): Promise<Column | null>;
   remove(column: Column): Promise<void>;

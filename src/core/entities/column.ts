@@ -1,13 +1,13 @@
 export class Column {
   private _id: string;
   private name: string;
-  private position: number;
+  private position: string;
   private boardId: string;
 
   constructor(params: {
     id: string;
     name: string;
-    position: number;
+    position: string;
     boardId: string;
   }) {
     if (typeof params.id !== "string") throw new Error("Invalid column id.");
@@ -23,8 +23,11 @@ export class Column {
 
     this.name = params.name;
 
-    if (typeof params.position !== "number" || isNaN(params.position))
+    if (typeof params.position !== "string")
       throw new Error("Invalid column position.");
+    params.position = params.position.trim();
+    if (params.position.length < 1)
+      throw new Error("Column position cannot be empty.");
 
     this.position = params.position;
 
@@ -57,9 +60,12 @@ export class Column {
     this.name = name;
   };
 
-  public moveTo = (position: number) => {
-    if (typeof position !== "number" || isNaN(position))
+  public moveTo = (position: string) => {
+    if (typeof position !== "string")
       throw new Error("Invalid column position.");
+    position = position.trim();
+    if (position.length < 1)
+      throw new Error("Column position cannot be empty.");
 
     this.position = position;
   };

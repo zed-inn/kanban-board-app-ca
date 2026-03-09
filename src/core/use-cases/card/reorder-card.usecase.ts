@@ -3,16 +3,15 @@ import {
   CardNotInColumnError,
   ParamsInsufficientCardReorderError,
 } from "../../errors/card.error";
-import type { CardConstant } from "../../interfaces/constants/card.constant";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { ColumnPolicy } from "../../interfaces/policy/column-policy.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { CardRepository } from "../../interfaces/repo/card-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
+import { LexoRank } from "../../services/lexorank.service";
 
 export class ReorderCard {
   constructor(
-    private cardConstant: CardConstant,
     private memberRepo: MemberRepository,
     private cardRepo: CardRepository,
     private memberPolicy: MemberPolicy,
@@ -29,28 +28,22 @@ export class ReorderCard {
     });
   };
 
-  private getBelowPosition = async (position: number, columnId: string) => {
+  private getBelowPosition = async (position: string, columnId: string) => {
     const belowCard = await this.cardRepo.getTopCardBelowPositionInColumn(
       position,
       columnId,
     );
 
-    const newPos = belowCard
-      ? (position + belowCard.attrbs.position) / 2
-      : position + this.cardConstant.POSITION_GAP;
-    return newPos;
+    return belowCard ? belowCard.attrbs.position : LexoRank.max;
   };
 
-  private getAbovePosition = async (position: number, columnId: string) => {
+  private getAbovePosition = async (position: string, columnId: string) => {
     const aboveCard = await this.cardRepo.getBottomCardAbovePositionInColumn(
       position,
       columnId,
     );
 
-    const newPos = aboveCard
-      ? (position + aboveCard.attrbs.position) / 2
-      : position + this.cardConstant.POSITION_GAP;
-    return newPos;
+    return aboveCard ? aboveCard.attrbs.position : LexoRank.min;
   };
 
   execute = async (
@@ -73,12 +66,17 @@ export class ReorderCard {
         boardId,
       );
 
-      const position = await (
+      const ipoNextPosition = await (
         iPOCard.attrbs.columnId !== card.attrbs.columnId ||
           iPOCard.attrbs.position > card.attrbs.position
           ? this.getAbovePosition
           : this.getBelowPosition
       )(iPOCard.attrbs.position, iPOCard.attrbs.columnId);
+
+      const position = LexoRank.average(
+        ipoNextPosition,
+        iPOCard.attrbs.position,
+      );
 
       card.relocateToNewColumn(iPOCard.attrbs.columnId);
       card.moveTo(position);
@@ -88,8 +86,8 @@ export class ReorderCard {
     } else if (location.columnId) {
       const topCard = await this.cardRepo.getTopInColumn(location.columnId);
       const position = topCard
-        ? topCard.attrbs.position + this.cardConstant.POSITION_GAP
-        : 0;
+        ? LexoRank.average(topCard.attrbs.position, LexoRank.max)
+        : LexoRank.average(LexoRank.min, LexoRank.max);
 
       card.relocateToNewColumn(location.columnId);
       card.moveTo(position);
