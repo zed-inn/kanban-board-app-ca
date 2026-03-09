@@ -1,18 +1,10 @@
-import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
-import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
+import type { BoardQuery } from "../../interfaces/queries/board-query.interface";
+import type { KeysetPagination } from "../../interfaces/queries/pagination";
 
 export class GetMemberBoards {
-  constructor(
-    private boardRepo: BoardRepository,
-    private memberRepo: MemberRepository,
-  ) {}
+  constructor(private boardQuery: BoardQuery) {}
 
-  execute = async (userId: string) => {
-    const memberships = await this.memberRepo.getByUserId(userId);
-    const boards = await this.boardRepo.getByIds(
-      memberships.map((m) => m.data.boardId),
-    );
-
-    return boards;
+  execute = async (userId: string, pagination: KeysetPagination) => {
+    return this.boardQuery.getByMemberId(userId, pagination);
   };
 }

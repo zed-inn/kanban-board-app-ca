@@ -1,11 +1,10 @@
-import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
+import type { BoardQuery } from "../../interfaces/queries/board-query.interface";
+import type { KeysetPagination } from "../../interfaces/queries/pagination";
 
 export class GetOwnedBoards {
-  constructor(private boardRepo: BoardRepository) {}
+  constructor(private boardQuery: BoardQuery) {}
 
-  execute = async (userId: string) => {
-    const boards = await this.boardRepo.getByOwnerId(userId);
-
-    return boards;
+  execute = async (userId: string, pagination: KeysetPagination) => {
+    return await this.boardQuery.getByOwnerId(userId, pagination);
   };
 }

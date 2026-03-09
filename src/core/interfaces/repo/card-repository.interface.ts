@@ -1,7 +1,6 @@
 import type { Card } from "../../entities/card";
 
 export interface CardRepository {
-  getByColumnId(columnId: string): Promise<Card[]>;
   getById(id: string): Promise<Card>;
   getTopInColumn(columnId: string): Promise<Card | null>;
   getTopCardBelowPositionInColumn(

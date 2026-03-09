@@ -1,20 +1,27 @@
-import type { CardRepository } from "../../interfaces/repo/card-repository.interface";
+import { ColumnNotInBoardError } from "../../errors/column.error";
+import type { CardQuery } from "../../interfaces/queries/card-query.interface";
+import type { KeysetPagination } from "../../interfaces/queries/pagination";
 import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
 import type { BoardAccessService } from "../../services/board-access.service";
 
 export class GetColumnCards {
   constructor(
+    private cardQuery: CardQuery,
     private columnRepo: ColumnRepository,
-    private cardRepo: CardRepository,
-    private boardAcess: BoardAccessService,
+    private boardAccess: BoardAccessService,
   ) {}
 
-  execute = async (boardId: string, columnId: string, userId: string) => {
-    await this.boardAcess.ensureMember(userId, boardId);
-    await this.columnRepo.isColumnInBoard(columnId, boardId);
+  execute = async (
+    boardId: string,
+    columnId: string,
+    userId: string,
+    pagination: KeysetPagination,
+  ) => {
+    await this.boardAccess.ensureMember(userId, boardId);
+    if (!(await this.columnRepo.isColumnInBoard(columnId, boardId))) {
+      throw new ColumnNotInBoardError();
+    }
 
-    const cards = await this.cardRepo.getByColumnId(columnId);
-
-    return cards;
+    return this.cardQuery.getByColumnId(columnId, pagination);
   };
 }

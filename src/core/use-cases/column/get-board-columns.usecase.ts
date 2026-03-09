@@ -1,17 +1,19 @@
-import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
+import type { ColumnQuery } from "../../interfaces/queries/column-query.interface";
+import type { KeysetPagination } from "../../interfaces/queries/pagination";
 import type { BoardAccessService } from "../../services/board-access.service";
 
 export class GetBoardColumns {
   constructor(
-    private columnRepo: ColumnRepository,
-    private boardAcess: BoardAccessService,
+    private columnQuery: ColumnQuery,
+    private boardAccess: BoardAccessService,
   ) {}
 
-  execute = async (boardId: string, userId: string) => {
-    await this.boardAcess.ensureMember(userId, boardId);
-
-    const columns = this.columnRepo.getByBoardId(boardId);
-
-    return columns;
+  execute = async (
+    boardId: string,
+    userId: string,
+    pagination: KeysetPagination,
+  ) => {
+    await this.boardAccess.ensureMember(userId, boardId);
+    return this.columnQuery.getByBoardId(boardId, pagination);
   };
 }
