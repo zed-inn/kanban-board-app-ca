@@ -54,4 +54,3 @@ export {
   InvalidColumnPositionError,
   NoColumnError,
 } from "./core/errors/column.error";
-export { NoUserError } from "./core/errors/user.error";

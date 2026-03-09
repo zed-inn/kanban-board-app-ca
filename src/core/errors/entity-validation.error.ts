@@ -1,4 +1,4 @@
-import type { ApplicationError } from "../services/application-error.service";
+import type { ApplicationError } from "./application.error";
 
 export class EntityValidationError extends Error implements ApplicationError {
   readonly error = "validation_error";
