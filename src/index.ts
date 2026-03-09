@@ -3,7 +3,6 @@ export { Board } from "./core/entities/board";
 export { BoardMembership } from "./core/entities/board-membership";
 export { Card } from "./core/entities/card";
 export { Column } from "./core/entities/column";
-export { User } from "./core/entities/user";
 
 // Interfaces
 export type { EventEmitter } from "./core/interfaces/emitter/event-emitter.interface";
