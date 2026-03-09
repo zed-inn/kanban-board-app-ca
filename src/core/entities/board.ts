@@ -3,7 +3,7 @@ import { EntityValidationError } from "../errors/entity-validation.error";
 export class Board {
   private readonly _id: string;
   private name: string;
-  private ownerId: string;
+  private _ownerId: string;
 
   private static readonly validate = {
     id: (id: string): string => {
@@ -50,11 +50,14 @@ export class Board {
   constructor(params: { id: string; name: string; ownerId: string }) {
     this._id = Board.validate.id(params.id);
     this.name = Board.validate.name(params.name);
-    this.ownerId = Board.validate.ownerId(params.ownerId);
+    this._ownerId = Board.validate.ownerId(params.ownerId);
   }
 
   public get data() {
     return { name: this.name };
+  }
+  public get ownerId() {
+    return this._ownerId;
   }
   public get id() {
     return this._id;
@@ -66,11 +69,11 @@ export class Board {
 
   public readonly transferOwnershipTo = (ownerId: string) => {
     const validOwnerId = Board.validate.ownerId(ownerId);
-    if (validOwnerId === this.ownerId)
+    if (validOwnerId === this._ownerId)
       throw new EntityValidationError(
         "TRANSFER_TO_SELF",
         "Ownership transfer to self is not allowed.",
       );
-    this.ownerId = validOwnerId;
+    this._ownerId = validOwnerId;
   };
 }
