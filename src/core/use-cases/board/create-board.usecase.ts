@@ -1,5 +1,5 @@
 import { Board } from "../../entities/board";
-import { BoardMembership } from "../../entities/board_membership";
+import { BoardMembership } from "../../entities/board-membership";
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 import type { UnitOfWork } from "../../interfaces/utils/unit-of-work.interface";

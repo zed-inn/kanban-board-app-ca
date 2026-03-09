@@ -1,6 +1,6 @@
 // Entities
 export { Board } from "./core/entities/board";
-export { BoardMembership } from "./core/entities/board_membership";
+export { BoardMembership } from "./core/entities/board-membership";
 export { Card } from "./core/entities/card";
 export { Column } from "./core/entities/column";
 export { User } from "./core/entities/user";
@@ -25,8 +25,8 @@ export { DeleteBoard } from "./core/use-cases/board/delete-board.usecase";
 export { GetMemberBoards } from "./core/use-cases/board/get-member-boards.usecase";
 export { GetOwnedBoards } from "./core/use-cases/board/get-owned-boards.usecase";
 export { RenameBoard } from "./core/use-cases/board/rename-board.usecase";
-export { AddMember } from "./core/use-cases/board_membership/add-member.usecase";
-export { RemoveMember } from "./core/use-cases/board_membership/remove-member.usecase";
+export { AddMember } from "./core/use-cases/board-membership/add-member.usecase";
+export { RemoveMember } from "./core/use-cases/board-membership/remove-member.usecase";
 export { AddCard } from "./core/use-cases/card/add-card.usecase";
 export { GetColumnCards } from "./core/use-cases/card/get-column-cards.usecase";
 export { RemoveCard } from "./core/use-cases/card/remove-card.usecase";

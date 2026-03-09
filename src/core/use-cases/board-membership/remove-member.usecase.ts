@@ -1,5 +1,5 @@
 import type { Board } from "../../entities/board";
-import { BoardMembership } from "../../entities/board_membership";
+import { BoardMembership } from "../../entities/board-membership";
 import { IsBoardOwnerError } from "../../errors/board.error";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";

@@ -1,5 +1,5 @@
 import type { Board } from "../../entities/board";
-import type { BoardMembership } from "../../entities/board_membership";
+import type { BoardMembership } from "../../entities/board-membership";
 
 export interface MemberRepository {
   exists(membership: BoardMembership): Promise<boolean>;
