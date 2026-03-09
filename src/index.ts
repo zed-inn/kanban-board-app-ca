@@ -6,15 +6,15 @@ export { Column } from "./core/entities/column";
 
 // Interfaces
 export type { EventEmitter } from "./core/interfaces/emitter/event-emitter.interface";
-export type { CardPolicy } from "./core/interfaces/policy/card-policy.interface";
-export type { ColumnPolicy } from "./core/interfaces/policy/column-policy.interface";
-export type { MemberPolicy } from "./core/interfaces/policy/member-policy.interface";
 export type { BoardRepository } from "./core/interfaces/repo/board-repository.interface";
 export type { CardRepository } from "./core/interfaces/repo/card-repository.interface";
 export type { ColumnRepository } from "./core/interfaces/repo/column-repository.interface";
 export type { MemberRepository } from "./core/interfaces/repo/member-repository.interface";
 export type { IdGenerator } from "./core/interfaces/utils/id-generator.interface";
 export type { UnitOfWork } from "./core/interfaces/utils/unit-of-work.interface";
+
+// Services
+export { BoardAccessService } from "./core/services/board-access.service";
 
 // Use cases
 export { ChangeOwner } from "./core/use-cases/board/change-owner.usecase";
@@ -37,16 +37,21 @@ export { RenameColumn } from "./core/use-cases/column/rename-column.usecase";
 export { ReorderColumn } from "./core/use-cases/column/reorder-column.usecase";
 
 // Errors
+export { ApplicationError } from "./core/errors/application.error";
+export { EntityValidationError } from "./core/errors/entity-validation.error";
 export {
   NoBoardError,
   NotBoardMemberError,
   NotBoardOwnerError,
+  IsBoardMemberError,
+  IsBoardOwnerError,
 } from "./core/errors/board.error";
 export {
   CardNotInColumnError,
   InvalidCardPositionError,
   NoCardError,
   ParamsInsufficientCardBodyUpdateError,
+  ParamsInsufficientCardReorderError,
 } from "./core/errors/card.error";
 export {
   ColumnNotInBoardError,

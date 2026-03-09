@@ -10,7 +10,7 @@ export class GetMemberBoards {
   execute = async (userId: string) => {
     const memberships = await this.memberRepo.getByUserId(userId);
     const boards = await this.boardRepo.getByIds(
-      memberships.map((m) => m.attrbs.boardId),
+      memberships.map((m) => m.data.boardId),
     );
 
     return boards;

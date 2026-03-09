@@ -36,6 +36,6 @@ export class ParamsInsufficientCardReorderError extends ApplicationError {
   readonly error = "bad_request";
   readonly code = "PARAMS_INSUFFICIENT_CARD_REORDER";
   constructor() {
-    super("Must provide a target columnId or iPOCardId to reorder.");
+    super("Must provide a target columnId or ipoCardId to reorder.");
   }
 }

@@ -15,12 +15,11 @@ export class CreateBoard {
 
   execute = async (name: string, userId: string) => {
     const boardId = await this.idGen.generateUnique();
+    const board = new Board({ id: boardId, name, ownerId: userId });
+    const member = new BoardMembership({ boardId, memberId: userId });
 
     await this.uow.atomic(async () => {
-      const board = new Board({ id: boardId, name, ownerId: userId });
       await this.boardRepo.save(board);
-
-      const member = new BoardMembership({ boardId, memberId: userId });
       await this.memberRepo.save(member);
     });
   };

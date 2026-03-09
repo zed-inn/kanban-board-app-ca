@@ -1,37 +1,32 @@
-import type { Board } from "../../entities/board";
 import { BoardMembership } from "../../entities/board-membership";
 import { IsBoardOwnerError } from "../../errors/board.error";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
-import type { MemberPolicy } from "../../interfaces/policy/member-policy.interface";
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
+import type { BoardAccessService } from "../../services/board-access.service";
 
 export class RemoveMember {
   constructor(
     private boardRepo: BoardRepository,
     private memberRepo: MemberRepository,
-    private memberPolicy: MemberPolicy,
+    private boardAccess: BoardAccessService,
     private eventEmitter: EventEmitter,
   ) {}
 
-  private emitEvents = async (board: Board, userId: string) => {
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(board.id);
-    this.eventEmitter.emit({
-      name: "MEMBER_LEFT",
-      detail: { board: board.attrbs, memberId: userId },
-      userIds: memberIds.filter((m) => m != userId),
-    });
-  };
-
   execute = async (boardId: string, memberId: string) => {
     const board = await this.boardRepo.getById(boardId);
-    if (board.attrbs.ownerId === memberId) throw new IsBoardOwnerError();
+    if (board.data.ownerId === memberId) throw new IsBoardOwnerError();
 
-    await this.memberPolicy.ensureMember(memberId, board.id);
+    await this.boardAccess.ensureMember(memberId, board.id);
 
     const member = new BoardMembership({ boardId: board.id, memberId });
     await this.memberRepo.remove(member);
 
-    this.emitEvents(board, memberId);
+    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(board.id);
+    this.eventEmitter.emit({
+      name: "MEMBER_LEFT",
+      detail: { board: board.data, memberId },
+      userIds: memberIds.filter((m) => m != memberId),
+    });
   };
 }

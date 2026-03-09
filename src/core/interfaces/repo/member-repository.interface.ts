@@ -3,6 +3,7 @@ import type { BoardMembership } from "../../entities/board-membership";
 
 export interface MemberRepository {
   exists(membership: BoardMembership): Promise<boolean>;
+  isMember(memberId: string, boardId: string): Promise<boolean>;
   getByUserId(userId: string): Promise<BoardMembership[]>;
   getAllBoardMemberIdsById(boardId: string): Promise<string[]>;
   removeAllBoardMembers(board: Board): Promise<void>;

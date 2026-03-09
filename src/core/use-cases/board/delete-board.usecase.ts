@@ -1,4 +1,3 @@
-import type { Board } from "../../entities/board";
 import { NotBoardOwnerError } from "../../errors/board.error";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { BoardRepository } from "../../interfaces/repo/board-repository.interface";
@@ -13,21 +12,9 @@ export class DeleteBoard {
     private eventEmitter: EventEmitter,
   ) {}
 
-  private emitEvents = async (
-    board: Board,
-    memberIds: string[],
-    userId: string,
-  ) => {
-    this.eventEmitter.emit({
-      name: "BOARD_DELETED",
-      detail: board.attrbs,
-      userIds: memberIds.filter((m) => m !== userId),
-    });
-  };
-
   execute = async (boardId: string, userId: string) => {
     const board = await this.boardRepo.getById(boardId);
-    if (board.attrbs.ownerId !== userId) throw new NotBoardOwnerError();
+    if (board.data.ownerId !== userId) throw new NotBoardOwnerError();
 
     const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
 
@@ -36,6 +23,10 @@ export class DeleteBoard {
       await this.memberRepo.removeAllBoardMembers(board);
     });
 
-    this.emitEvents(board, memberIds, userId);
+    this.eventEmitter.emit({
+      name: "BOARD_DELETED",
+      detail: board.data,
+      userIds: memberIds.filter((m) => m !== userId),
+    });
   };
 }
