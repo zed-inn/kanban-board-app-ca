@@ -54,7 +54,7 @@ export class Board {
   }
 
   public get data() {
-    return { id: this._id, name: this.name, ownerId: this.ownerId };
+    return { name: this.name };
   }
   public get id() {
     return this._id;

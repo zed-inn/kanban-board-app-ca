@@ -74,12 +74,10 @@ export class Column {
   }
 
   public get data() {
-    return {
-      id: this._id,
-      name: this.name,
-      position: this.position,
-      boardId: this.boardId,
-    };
+    return { name: this.name };
+  }
+  public get location() {
+    return { position: this.position, boardId: this.boardId };
   }
   public get id() {
     return this._id;

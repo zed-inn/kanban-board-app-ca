@@ -85,13 +85,10 @@ export class Card {
   }
 
   public get data() {
-    return {
-      id: this._id,
-      title: this.title,
-      content: this.content,
-      position: this.position,
-      columnId: this.columnId,
-    };
+    return { title: this.title, content: this.content };
+  }
+  public get location() {
+    return { position: this.position, columnId: this.columnId };
   }
   public get id() {
     return this._id;

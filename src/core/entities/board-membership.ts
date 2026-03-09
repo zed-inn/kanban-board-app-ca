@@ -1,8 +1,8 @@
 import { EntityValidationError } from "../errors/entity-validation.error";
 
 export class BoardMembership {
-  private readonly boardId: string;
-  private readonly memberId: string;
+  private readonly _boardId: string;
+  private readonly _memberId: string;
 
   private static readonly validate = {
     boardId: (id: string): string => {
@@ -34,11 +34,14 @@ export class BoardMembership {
   };
 
   constructor(params: { boardId: string; memberId: string }) {
-    this.boardId = BoardMembership.validate.boardId(params.boardId);
-    this.memberId = BoardMembership.validate.memberId(params.memberId);
+    this._boardId = BoardMembership.validate.boardId(params.boardId);
+    this._memberId = BoardMembership.validate.memberId(params.memberId);
   }
 
-  public get data() {
-    return { boardId: this.boardId, memberId: this.memberId };
+  public get boardId() {
+    return this._boardId;
+  }
+  public get memberId() {
+    return this._memberId;
   }
 }
