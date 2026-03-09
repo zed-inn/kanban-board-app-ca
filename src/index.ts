@@ -6,6 +6,9 @@ export { Column } from "./core/entities/column";
 
 // Interfaces
 export type { EventEmitter } from "./core/interfaces/emitter/event-emitter.interface";
+export type { BoardQuery } from "./core/interfaces/queries/board-query.interface";
+export type { CardQuery } from "./core/interfaces/queries/card-query.interface";
+export type { ColumnQuery } from "./core/interfaces/queries/column-query.interface";
 export type { BoardRepository } from "./core/interfaces/repo/board-repository.interface";
 export type { CardRepository } from "./core/interfaces/repo/card-repository.interface";
 export type { ColumnRepository } from "./core/interfaces/repo/column-repository.interface";
