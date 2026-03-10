@@ -19,7 +19,7 @@ export class RemoveColumn {
 
     await this.columnRepo.remove(column);
 
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(boardId);
     this.eventEmitter.emit({
       name: "COLUMN_REMOVED",
       detail: column.data,

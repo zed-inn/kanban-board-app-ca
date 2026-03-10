@@ -16,11 +16,11 @@ export class DeleteBoard {
     const board = await this.boardRepo.getById(boardId);
     if (board.ownerId !== userId) throw new NotBoardOwnerError();
 
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(board.id);
 
     await this.uow.atomic(async () => {
       await this.boardRepo.remove(board);
-      await this.memberRepo.removeAllBoardMembers(board);
+      await this.memberRepo.removeAll(board.id);
     });
 
     this.eventEmitter.emit({

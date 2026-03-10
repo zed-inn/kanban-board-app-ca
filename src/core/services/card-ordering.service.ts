@@ -13,7 +13,7 @@ export class CardOrderingService {
 
   async insertAfterCard(card: Card) {
     const ccl = card.location;
-    const nc = await this.cardRepo.getTopCardBelowPositionInColumn(
+    const nc = await this.cardRepo.getTopBelowPositionInColumn(
       ccl.position,
       ccl.columnId,
     );
@@ -23,7 +23,7 @@ export class CardOrderingService {
 
   async insertBeforeCard(card: Card) {
     const ccl = card.location;
-    const bc = await this.cardRepo.getBottomCardAbovePositionInColumn(
+    const bc = await this.cardRepo.getBottomAbovePositionInColumn(
       ccl.position,
       ccl.columnId,
     );

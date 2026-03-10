@@ -8,7 +8,7 @@ export class ColumnAccessService {
     columnId: string,
     boardId: string,
   ): Promise<void> {
-    if (!(await this.columnRepo.isColumnInBoard(columnId, boardId))) {
+    if (!(await this.columnRepo.existsInBoard(columnId, boardId))) {
       throw new ColumnNotInBoardError();
     }
   }

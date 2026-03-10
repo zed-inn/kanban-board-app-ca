@@ -36,7 +36,7 @@ export class UpdateCardBody {
     card.updateBody(body);
     await this.cardRepo.save(card);
 
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(boardId);
     this.eventEmitter.emit({
       name: "CARD_BODY_UPDATED",
       detail: card.data,

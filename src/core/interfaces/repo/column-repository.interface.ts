@@ -1,14 +1,14 @@
 import type { Column } from "../../entities/column";
 
 export interface ColumnRepository {
-  isColumnInBoard(columnId: string, boardId: string): Promise<boolean>;
+  existsInBoard(columnId: string, boardId: string): Promise<boolean>;
   getById(id: string): Promise<Column>;
   getTopInBoard(boardId: string): Promise<Column | null>;
-  getTopColumnBelowPositionInBoard(
+  getTopBelowPositionInBoard(
     position: string,
     boardId: string,
   ): Promise<Column | null>;
-  getBottomColumnAbovePositionInBoard(
+  getBottomAbovePositionInBoard(
     position: string,
     boardId: string,
   ): Promise<Column | null>;

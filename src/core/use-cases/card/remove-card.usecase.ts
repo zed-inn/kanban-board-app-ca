@@ -29,7 +29,7 @@ export class RemoveCard {
 
     await this.cardRepo.remove(card);
 
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(boardId);
     this.eventEmitter.emit({
       name: "CARD_REMOVED",
       detail: card.data,

@@ -14,7 +14,7 @@ export class ChangeOwner {
   ) {}
 
   private emitEvents = async (board: Board, userId: string) => {
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(board.id);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(board.id);
     this.eventEmitter.emit({
       name: "BOARD_OWNER_CHANGED",
       detail: board.data,
@@ -30,11 +30,11 @@ export class ChangeOwner {
   execute = async (boardId: string, ownerId: string, userId: string) => {
     const board = await this.boardRepo.getById(boardId);
     if (board.ownerId !== ownerId) throw new NotBoardOwnerError();
-
     await this.boardAccess.ensureMember(userId, board.id);
-    board.transferOwnershipTo(userId);
 
+    board.transferOwnershipTo(userId);
     await this.boardRepo.save(board);
+
     this.emitEvents(board, userId);
   };
 }

@@ -25,7 +25,7 @@ export class AddColumn {
     const column = new Column({ id: columnId, name, boardId, position });
     await this.columnRepo.save(column);
 
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(boardId);
     this.eventEmitter.emit({
       name: "COLUMN_ADDED",
       detail: column.data,

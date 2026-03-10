@@ -38,7 +38,7 @@ export class ReorderColumn {
     column.moveTo(newPosition);
     await this.columnRepo.save(column);
 
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(boardId);
     this.eventEmitter.emit({
       name: "COLUMN_REORDERED",
       detail: column.data,

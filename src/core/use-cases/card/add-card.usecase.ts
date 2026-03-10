@@ -34,7 +34,7 @@ export class AddCard {
     const card = new Card({ id: cardId, title, content, position, columnId });
     await this.cardRepo.save(card);
 
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(boardId);
     this.eventEmitter.emit({
       name: "CARD_ADDED",
       detail: card.data,

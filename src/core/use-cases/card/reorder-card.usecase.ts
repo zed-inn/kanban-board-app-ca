@@ -58,7 +58,7 @@ export class ReorderCard {
       this.cardRepo.save(card);
     } else throw new ParamsInsufficientCardReorderError();
 
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(boardId);
     this.eventEmitter.emit({
       name: "CARD_REORDERED",
       detail: card.data,

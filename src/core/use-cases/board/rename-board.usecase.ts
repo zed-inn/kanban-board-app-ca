@@ -18,7 +18,7 @@ export class RenameBoard {
     board.rename(name);
     await this.boardRepo.save(board);
 
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(board.id);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(board.id);
     this.eventEmitter.emit({
       name: "BOARD_RENAMED",
       detail: board.data,

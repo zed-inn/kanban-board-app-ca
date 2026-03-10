@@ -25,7 +25,7 @@ export class RenameColumn {
     column.rename(name);
     await this.columnRepo.save(column);
 
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(boardId);
     this.eventEmitter.emit({
       name: "COLUMN_RENAMED",
       detail: column.data,

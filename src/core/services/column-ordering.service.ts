@@ -13,7 +13,7 @@ export class ColumnOrderingService {
 
   async insertAfterColumn(column: Column) {
     const ccl = column.location;
-    const nc = await this.columnRepo.getTopColumnBelowPositionInBoard(
+    const nc = await this.columnRepo.getTopBelowPositionInBoard(
       ccl.position,
       ccl.boardId,
     );
@@ -23,7 +23,7 @@ export class ColumnOrderingService {
 
   async insertBeforeColumn(column: Column) {
     const ccl = column.location;
-    const bc = await this.columnRepo.getBottomColumnAbovePositionInBoard(
+    const bc = await this.columnRepo.getBottomAbovePositionInBoard(
       ccl.position,
       ccl.boardId,
     );

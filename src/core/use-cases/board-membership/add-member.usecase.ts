@@ -15,7 +15,7 @@ export class AddMember {
   ) {}
 
   private emitEvents = async (board: Board, userId: string) => {
-    const memberIds = await this.memberRepo.getAllBoardMemberIdsById(board.id);
+    const memberIds = await this.memberRepo.getAllMemberIdsByBoardId(board.id);
     this.eventEmitter.emit({
       name: "NEW_MEMBER_JOINED",
       detail: { board: board.data, memberId: userId },

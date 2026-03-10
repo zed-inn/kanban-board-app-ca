@@ -3,11 +3,11 @@ import type { Card } from "../../entities/card";
 export interface CardRepository {
   getById(id: string): Promise<Card>;
   getTopInColumn(columnId: string): Promise<Card | null>;
-  getTopCardBelowPositionInColumn(
+  getTopBelowPositionInColumn(
     position: string,
     columnId: string,
   ): Promise<Card | null>;
-  getBottomCardAbovePositionInColumn(
+  getBottomAbovePositionInColumn(
     position: string,
     columnId: string,
   ): Promise<Card | null>;

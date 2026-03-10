@@ -1,5 +1,6 @@
 import type { MemberRepository } from "../interfaces/repo/member-repository.interface";
 import { NotBoardMemberError } from "../errors/board.error";
+import { BoardMembership } from "../entities/board-membership";
 
 export class BoardAccessService {
   constructor(private memberRepo: MemberRepository) {}
@@ -8,7 +9,8 @@ export class BoardAccessService {
     userId: string,
     boardId: string,
   ): Promise<void> => {
-    if (!(await this.memberRepo.isMember(userId, boardId))) {
+    const membership = new BoardMembership({ memberId: userId, boardId });
+    if (!(await this.memberRepo.exists(membership))) {
       throw new NotBoardMemberError();
     }
   };
