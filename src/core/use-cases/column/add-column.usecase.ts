@@ -21,7 +21,7 @@ export class AddColumn {
 
     const columnId = await this.idGen.generate();
     const position =
-      await this.columnOrderingService.calculateAfterTop(columnId);
+      await this.columnOrderingService.calculateAfterTop(boardId);
 
     const column = new Column({ id: columnId, name, boardId, position });
     await this.columnRepo.save(column);

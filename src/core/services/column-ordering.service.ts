@@ -5,8 +5,8 @@ import { LexoRank } from "./lexorank.service";
 export class ColumnOrderingService {
   constructor(private columnRepo: ColumnRepository) {}
 
-  async calculateAfterTop(columnId: string) {
-    const cc = await this.columnRepo.getTopInBoard(columnId);
+  async calculateAfterTop(boardId: string) {
+    const cc = await this.columnRepo.getTopInBoard(boardId);
     const ccl = cc?.location;
     return LexoRank.average(ccl?.position ?? LexoRank.min, LexoRank.max);
   }
