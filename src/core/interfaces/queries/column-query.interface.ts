@@ -1,13 +1,7 @@
+import type { Column } from "../../entities/column";
 import type { KeysetPagination, PaginatedResult } from "./pagination";
 
-export type ColumnReadModel = {
-  id: string;
-  name: string;
-  position: string;
-  boardId: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+export type ColumnReadModel = Column["toJSON"] & Record<string, unknown>;
 
 export interface ColumnQuery {
   getByBoardId(

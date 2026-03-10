@@ -44,4 +44,7 @@ export class BoardMembership {
   public get memberId() {
     return this._memberId;
   }
+  public get toJSON() {
+    return { boardId: this._boardId, memberId: this._memberId };
+  }
 }

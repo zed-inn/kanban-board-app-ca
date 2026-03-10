@@ -93,6 +93,9 @@ export class Card {
   public get id() {
     return this._id;
   }
+  public get toJSON() {
+    return { id: this._id, ...this.data, ...this.location };
+  }
 
   public readonly updateBody = (params: {
     title?: string;

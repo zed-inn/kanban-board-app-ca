@@ -62,6 +62,9 @@ export class Board {
   public get id() {
     return this._id;
   }
+  public get toJSON() {
+    return { id: this._id, ...this.data, ownerId: this.ownerId };
+  }
 
   public readonly rename = (name: string) => {
     this.name = Board.validate.name(name);

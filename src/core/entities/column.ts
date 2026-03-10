@@ -82,6 +82,9 @@ export class Column {
   public get id() {
     return this._id;
   }
+  public get toJSON() {
+    return { id: this._id, ...this.data, ...this.location };
+  }
 
   public readonly rename = (name: string) => {
     this.name = Column.validate.name(name);

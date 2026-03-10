@@ -1,14 +1,7 @@
+import type { Card } from "../../entities/card";
 import type { KeysetPagination, PaginatedResult } from "./pagination";
 
-export type CardReadModel = {
-  id: string;
-  title: string;
-  content: string | null;
-  position: string;
-  columnId: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+export type CardReadModel = Card["toJSON"] & Record<string, unknown>;
 
 export interface CardQuery {
   getByColumnId(
