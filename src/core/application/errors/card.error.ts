@@ -23,19 +23,3 @@ export class InvalidCardPositionError extends ApplicationError {
     super("The specified card position is invalid or taken.");
   }
 }
-
-export class ParamsInsufficientCardBodyUpdateError extends ApplicationError {
-  readonly error = "invalid_action";
-  readonly code = "PARAMS_INSUFFICIENT_CARD_BODY_UPDATE";
-  constructor() {
-    super("Must provide at least a title or content to update.");
-  }
-}
-
-export class ParamsInsufficientCardReorderError extends ApplicationError {
-  readonly error = "invalid_action";
-  readonly code = "PARAMS_INSUFFICIENT_CARD_REORDER";
-  constructor() {
-    super("Must provide a target columnId or ipoCardId to reorder.");
-  }
-}

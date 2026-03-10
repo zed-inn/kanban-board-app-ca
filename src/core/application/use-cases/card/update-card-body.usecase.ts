@@ -3,13 +3,19 @@ import { BoardId } from "@domain/value-object/board-id.vo";
 import { CardId } from "@domain/value-object/card-id.vo";
 import { ColumnId } from "@domain/value-object/column-id.vo";
 import { UserId } from "@domain/value-object/user-id.vo";
-import {
-  CardNotInColumnError,
-  ParamsInsufficientCardBodyUpdateError,
-} from "@errors/card.error";
+import { ApplicationError } from "@errors/application.error";
+import { CardNotInColumnError } from "@errors/card.error";
 import type { CardRepository } from "@interfaces/repo/card-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";
 import type { ColumnAccessService } from "@services/column-access.service";
+
+export class ParamsInsufficientCardBodyUpdateError extends ApplicationError {
+  readonly error = "invalid_action";
+  readonly code = "PARAMS_INSUFFICIENT_CARD_BODY_UPDATE";
+  constructor() {
+    super("Must provide at least a title or content to update.");
+  }
+}
 
 type UpdateCardBodyCommand = {
   cardId: string;
