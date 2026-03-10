@@ -32,8 +32,8 @@ export class ReorderColumn {
 
     const newPosition =
       tcl.position > cl.position
-        ? await this.columnOrderingService.insertBeforeColumn(targetColumn)
-        : await this.columnOrderingService.insertAfterColumn(targetColumn);
+        ? await this.columnOrderingService.calculateBeforeColumn(targetColumn)
+        : await this.columnOrderingService.calculateAfterColumn(targetColumn);
 
     column.moveTo(newPosition);
     await this.columnRepo.save(column);

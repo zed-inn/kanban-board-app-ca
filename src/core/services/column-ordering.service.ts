@@ -5,13 +5,13 @@ import { LexoRank } from "./lexorank.service";
 export class ColumnOrderingService {
   constructor(private columnRepo: ColumnRepository) {}
 
-  async insertAfterTop(columnId: string) {
+  async calculateAfterTop(columnId: string) {
     const cc = await this.columnRepo.getTopInBoard(columnId);
     const ccl = cc?.location;
     return LexoRank.average(ccl?.position ?? LexoRank.min, LexoRank.max);
   }
 
-  async insertAfterColumn(column: Column) {
+  async calculateAfterColumn(column: Column) {
     const ccl = column.location;
     const nc = await this.columnRepo.getTopBelowPositionInBoard(
       ccl.position,
@@ -21,7 +21,7 @@ export class ColumnOrderingService {
     return LexoRank.average(ccl.position, ncl?.position ?? LexoRank.max);
   }
 
-  async insertBeforeColumn(column: Column) {
+  async calculateBeforeColumn(column: Column) {
     const ccl = column.location;
     const bc = await this.columnRepo.getBottomAbovePositionInBoard(
       ccl.position,

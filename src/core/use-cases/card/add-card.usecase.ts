@@ -29,7 +29,7 @@ export class AddCard {
     await this.columnAccess.ensureColumnInBoard(columnId, boardId);
 
     const cardId = await this.idGen.generate();
-    const position = await this.cardOrderingService.insertAfterTop(columnId);
+    const position = await this.cardOrderingService.calculateAfterTop(columnId);
 
     const card = new Card({ id: cardId, title, content, position, columnId });
     await this.cardRepo.save(card);
