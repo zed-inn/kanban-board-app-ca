@@ -30,13 +30,10 @@ export class ReorderColumn {
     const tcl = targetColumn.location;
     if (tcl.boardId !== boardId) throw new ColumnNotInBoardError();
 
-    let newPosition;
-    if (tcl.position > cl.position)
-      newPosition =
-        await this.columnOrderingService.insertBeforeColumn(targetColumn);
-    else
-      newPosition =
-        await this.columnOrderingService.insertAfterColumn(targetColumn);
+    const newPosition =
+      tcl.position > cl.position
+        ? await this.columnOrderingService.insertBeforeColumn(targetColumn)
+        : await this.columnOrderingService.insertAfterColumn(targetColumn);
 
     column.moveTo(newPosition);
     await this.columnRepo.save(column);

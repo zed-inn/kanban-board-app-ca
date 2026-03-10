@@ -38,10 +38,10 @@ export class ReorderCard {
       const tcl = tc.location;
       await this.columnAccess.ensureColumnInBoard(tcl.columnId, boardId);
 
-      let newPosition;
-      if (tcl.columnId !== columnId || tcl.position > cl.position)
-        newPosition = await this.cardOrderService.insertBeforeCard(tc);
-      else newPosition = await this.cardOrderService.insertAfterCard(tc);
+      const newPosition =
+        tcl.columnId !== columnId || tcl.position > cl.position
+          ? await this.cardOrderService.insertBeforeCard(tc)
+          : await this.cardOrderService.insertAfterCard(tc);
 
       card.relocateToNewColumn(tcl.columnId);
       card.moveTo(newPosition);
