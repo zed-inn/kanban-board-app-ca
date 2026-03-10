@@ -1,9 +1,9 @@
 export type KeysetPagination = {
-  cursor?: string;
+  cursor?: unknown;
   limit: number;
 };
 
 export type PaginatedResult<T> = {
   data: T[];
-  nextCursor?: string;
+  nextCursor?: unknown;
 };
