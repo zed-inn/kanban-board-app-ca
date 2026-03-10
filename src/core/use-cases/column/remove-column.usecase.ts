@@ -15,7 +15,7 @@ export class RemoveColumn {
   execute = async (columnId: string, boardId: string, userId: string) => {
     await this.boardAccess.ensureMember(userId, boardId);
     const column = await this.columnRepo.getById(columnId);
-    if (column.data.boardId !== boardId) throw new ColumnNotInBoardError();
+    if (column.location.boardId !== boardId) throw new ColumnNotInBoardError();
 
     await this.columnRepo.remove(column);
 

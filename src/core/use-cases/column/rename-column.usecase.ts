@@ -20,7 +20,7 @@ export class RenameColumn {
   ) => {
     await this.boardAccess.ensureMember(userId, boardId);
     const column = await this.columnRepo.getById(columnId);
-    if (column.data.boardId !== boardId) throw new ColumnNotInBoardError();
+    if (column.location.boardId !== boardId) throw new ColumnNotInBoardError();
 
     column.rename(name);
     await this.columnRepo.save(column);

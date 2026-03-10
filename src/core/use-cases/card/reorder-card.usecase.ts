@@ -2,78 +2,59 @@ import {
   CardNotInColumnError,
   ParamsInsufficientCardReorderError,
 } from "../../errors/card.error";
-import { ColumnNotInBoardError } from "../../errors/column.error";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { CardRepository } from "../../interfaces/repo/card-repository.interface";
-import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
-import { LexoRank } from "../../services/lexorank.service";
 import type { BoardAccessService } from "../../services/board-access.service";
+import { CardOrderingService } from "../../services/card-ordering.service";
+import type { ColumnAccessService } from "../../services/column-access.service";
 
 export class ReorderCard {
   constructor(
     private memberRepo: MemberRepository,
     private cardRepo: CardRepository,
-    private columnRepo: ColumnRepository,
     private boardAccess: BoardAccessService,
+    private columnAccess: ColumnAccessService,
+    private cardOrderService: CardOrderingService,
     private eventEmitter: EventEmitter,
   ) {}
 
   execute = async (
     cardId: string,
-    location: { columnId?: string; ipoCardId?: string },
+    target: { columnId?: string; cardId?: string },
     columnId: string,
     boardId: string,
     userId: string,
   ) => {
     await this.boardAccess.ensureMember(userId, boardId);
-    if (!(await this.columnRepo.isColumnInBoard(columnId, boardId)))
-      throw new ColumnNotInBoardError();
+    await this.columnAccess.ensureColumnInBoard(columnId, boardId);
 
     const card = await this.cardRepo.getById(cardId);
-    if (card.data.columnId !== columnId) throw new CardNotInColumnError();
+    const cl = card.location;
+    if (cl.columnId !== columnId) throw new CardNotInColumnError();
 
-    if (location.ipoCardId) {
-      const ipoCard = await this.cardRepo.getById(location.ipoCardId);
-      if (
-        !(await this.columnRepo.isColumnInBoard(ipoCard.data.columnId, boardId))
-      )
-        throw new ColumnNotInBoardError();
+    if (target.cardId) {
+      const tc = await this.cardRepo.getById(target.cardId);
+      const tcl = tc.location;
+      await this.columnAccess.ensureColumnInBoard(tcl.columnId, boardId);
 
-      let ipoNextPosition;
-      if (
-        ipoCard.data.columnId !== card.data.columnId ||
-        ipoCard.data.position > card.data.position
-      ) {
-        const aboveCard =
-          await this.cardRepo.getBottomCardAbovePositionInColumn(
-            ipoCard.data.position,
-            ipoCard.data.columnId,
-          );
-        ipoNextPosition = aboveCard ? aboveCard.data.position : LexoRank.min;
-      } else {
-        const belowCard = await this.cardRepo.getTopCardBelowPositionInColumn(
-          ipoCard.data.position,
-          ipoCard.data.columnId,
-        );
-        ipoNextPosition = belowCard ? belowCard.data.position : LexoRank.max;
-      }
+      let newPosition;
+      if (tcl.columnId !== columnId || tcl.position > cl.position)
+        newPosition = await this.cardOrderService.insertBeforeCard(tc);
+      else newPosition = await this.cardOrderService.insertAfterCard(tc);
 
-      const position = LexoRank.average(ipoNextPosition, ipoCard.data.position);
-      card.relocateToNewColumn(ipoCard.data.columnId);
-      card.moveTo(position);
+      card.relocateToNewColumn(tcl.columnId);
+      card.moveTo(newPosition);
       this.cardRepo.save(card);
-    } else if (location.columnId) {
-      if (!(await this.columnRepo.isColumnInBoard(location.columnId, boardId)))
-        throw new ColumnNotInBoardError();
-      const topCard = await this.cardRepo.getTopInColumn(location.columnId);
+    } else if (target.columnId) {
+      await this.columnAccess.ensureColumnInBoard(target.columnId, boardId);
 
-      const position = topCard
-        ? LexoRank.average(topCard.data.position, LexoRank.max)
-        : LexoRank.average(LexoRank.min, LexoRank.max);
+      const newPosition = await this.cardOrderService.insertAfterTop(
+        target.columnId,
+      );
 
-      card.relocateToNewColumn(location.columnId);
-      card.moveTo(position);
+      card.relocateToNewColumn(target.columnId);
+      card.moveTo(newPosition);
       this.cardRepo.save(card);
     } else throw new ParamsInsufficientCardReorderError();
 

@@ -3,8 +3,8 @@ import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interf
 import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
 import type { IdGenerator } from "../../interfaces/utils/id-generator.interface";
-import { LexoRank } from "../../services/lexorank.service";
 import type { BoardAccessService } from "../../services/board-access.service";
+import type { ColumnOrderingService } from "../../services/column-ordering.service";
 
 export class AddColumn {
   constructor(
@@ -12,17 +12,15 @@ export class AddColumn {
     private memberRepo: MemberRepository,
     private columnRepo: ColumnRepository,
     private boardAccess: BoardAccessService,
+    private columnOrderingService: ColumnOrderingService,
     private eventEmitter: EventEmitter,
   ) {}
 
   execute = async (name: string, boardId: string, userId: string) => {
     await this.boardAccess.ensureMember(userId, boardId);
-    const columnId = await this.idGen.generate();
-    const topColumn = await this.columnRepo.getTopInBoard(boardId);
 
-    const position = topColumn
-      ? LexoRank.average(topColumn.data.position, LexoRank.max)
-      : LexoRank.average(LexoRank.min, LexoRank.max);
+    const columnId = await this.idGen.generate();
+    const position = await this.columnOrderingService.insertAfterTop(columnId);
 
     const column = new Column({ id: columnId, name, boardId, position });
     await this.columnRepo.save(column);

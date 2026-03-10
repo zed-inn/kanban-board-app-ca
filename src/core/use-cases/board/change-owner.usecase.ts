@@ -29,7 +29,7 @@ export class ChangeOwner {
 
   execute = async (boardId: string, ownerId: string, userId: string) => {
     const board = await this.boardRepo.getById(boardId);
-    if (board.data.ownerId !== ownerId) throw new NotBoardOwnerError();
+    if (board.ownerId !== ownerId) throw new NotBoardOwnerError();
 
     await this.boardAccess.ensureMember(userId, board.id);
     board.transferOwnershipTo(userId);

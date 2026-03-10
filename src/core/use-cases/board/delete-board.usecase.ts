@@ -14,7 +14,7 @@ export class DeleteBoard {
 
   execute = async (boardId: string, userId: string) => {
     const board = await this.boardRepo.getById(boardId);
-    if (board.data.ownerId !== userId) throw new NotBoardOwnerError();
+    if (board.ownerId !== userId) throw new NotBoardOwnerError();
 
     const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
 

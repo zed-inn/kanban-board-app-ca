@@ -15,7 +15,7 @@ export class RemoveMember {
 
   execute = async (boardId: string, memberId: string) => {
     const board = await this.boardRepo.getById(boardId);
-    if (board.data.ownerId === memberId) throw new IsBoardOwnerError();
+    if (board.ownerId === memberId) throw new IsBoardOwnerError();
 
     await this.boardAccess.ensureMember(memberId, board.id);
 

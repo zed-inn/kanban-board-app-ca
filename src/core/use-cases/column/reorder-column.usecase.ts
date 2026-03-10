@@ -2,49 +2,43 @@ import { ColumnNotInBoardError } from "../../errors/column.error";
 import type { EventEmitter } from "../../interfaces/emitter/event-emitter.interface";
 import type { ColumnRepository } from "../../interfaces/repo/column-repository.interface";
 import type { MemberRepository } from "../../interfaces/repo/member-repository.interface";
-import { LexoRank } from "../../services/lexorank.service";
 import type { BoardAccessService } from "../../services/board-access.service";
+import type { ColumnOrderingService } from "../../services/column-ordering.service";
 
 export class ReorderColumn {
   constructor(
     private memberRepo: MemberRepository,
     private columnRepo: ColumnRepository,
     private boardAccess: BoardAccessService,
+    private columnOrderingService: ColumnOrderingService,
     private eventEmitter: EventEmitter,
   ) {}
 
   execute = async (
     columnId: string,
-    iPOColumnId: string,
+    targetColumnId: string,
     boardId: string,
     userId: string,
   ) => {
     await this.boardAccess.ensureMember(userId, boardId);
+
     const column = await this.columnRepo.getById(columnId);
-    if (column.data.boardId !== boardId) throw new ColumnNotInBoardError();
+    const cl = column.location;
+    if (cl.boardId !== boardId) throw new ColumnNotInBoardError();
 
-    const ipoColumn = await this.columnRepo.getById(iPOColumnId);
-    if (ipoColumn.data.boardId !== boardId) throw new ColumnNotInBoardError();
+    const targetColumn = await this.columnRepo.getById(targetColumnId);
+    const tcl = targetColumn.location;
+    if (tcl.boardId !== boardId) throw new ColumnNotInBoardError();
 
-    let ipoNextPosition;
-    if (ipoColumn.data.position < column.data.position) {
-      const belowColumn =
-        await this.columnRepo.getTopColumnBelowPositionInBoard(
-          ipoColumn.data.position,
-          boardId,
-        );
-      ipoNextPosition = belowColumn ? belowColumn.data.position : LexoRank.max;
-    } else {
-      const aboveColumn =
-        await this.columnRepo.getBottomColumnAbovePositionInBoard(
-          ipoColumn.data.position,
-          boardId,
-        );
-      ipoNextPosition = aboveColumn ? aboveColumn.data.position : LexoRank.min;
-    }
+    let newPosition;
+    if (tcl.position > cl.position)
+      newPosition =
+        await this.columnOrderingService.insertBeforeColumn(targetColumn);
+    else
+      newPosition =
+        await this.columnOrderingService.insertAfterColumn(targetColumn);
 
-    const position = LexoRank.average(ipoNextPosition, ipoColumn.data.position);
-    column.moveTo(position);
+    column.moveTo(newPosition);
     await this.columnRepo.save(column);
 
     const memberIds = await this.memberRepo.getAllBoardMemberIdsById(boardId);
