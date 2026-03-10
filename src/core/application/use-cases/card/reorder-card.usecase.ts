@@ -1,0 +1,90 @@
+import { CardPosition } from "@domain/entities/card";
+import { BoardId } from "@domain/value-object/board-id.vo";
+import { CardId } from "@domain/value-object/card-id.vo";
+import { ColumnId } from "@domain/value-object/column-id.vo";
+import { UserId } from "@domain/value-object/user-id.vo";
+import {
+  CardNotInColumnError,
+  ParamsInsufficientCardReorderError,
+} from "@errors/card.error";
+import type { CardRepository } from "@interfaces/repo/card-repository.interface";
+import type { BoardAccessService } from "@services/board-access.service";
+import type { CardOrderingService } from "@services/card-ordering.service";
+import type { ColumnAccessService } from "@services/column-access.service";
+
+type ReorderCardCommand = {
+  cardId: string;
+  columnId: string;
+  boardId: string;
+  memberId: string;
+  targetColumnId?: string;
+  targetCardId?: string;
+};
+
+export class ReorderCard {
+  constructor(
+    private cardRepo: CardRepository,
+    private boardAccess: BoardAccessService,
+    private columnAccess: ColumnAccessService,
+    private cardOrderService: CardOrderingService,
+  ) {}
+
+  private serialize(cmd: ReorderCardCommand) {
+    return {
+      cardId: new CardId(cmd.cardId),
+      columnId: new ColumnId(cmd.columnId),
+      boardId: new BoardId(cmd.boardId),
+      memberId: new UserId(cmd.memberId),
+      ...(cmd.targetColumnId
+        ? { targetColumnId: new ColumnId(cmd.columnId) }
+        : {}),
+      ...(cmd.targetCardId
+        ? { targetCardId: new CardId(cmd.targetCardId) }
+        : {}),
+    };
+  }
+
+  async execute(cmd: ReorderCardCommand) {
+    const {
+      boardId,
+      cardId,
+      columnId,
+      memberId,
+      targetCardId,
+      targetColumnId,
+    } = this.serialize(cmd);
+
+    await this.boardAccess.ensureMember(memberId, boardId);
+    await this.columnAccess.ensureColumnInBoard(columnId, boardId);
+
+    const card = await this.cardRepo.getById(cardId);
+    if (card.columnId.isDifferent(columnId)) throw new CardNotInColumnError();
+
+    if (targetCardId) {
+      const targetCard = await this.cardRepo.getById(targetCardId);
+      await this.columnAccess.ensureColumnInBoard(targetCard.columnId, boardId);
+
+      const pos =
+        targetCard.columnId.isDifferent(columnId) ||
+        targetCard.position.isAfter(card.position)
+          ? await this.cardOrderService.calculateBeforeCard(targetCard)
+          : await this.cardOrderService.calculateAfterCard(targetCard);
+      const newPosition = new CardPosition(pos);
+
+      card.relocateToNewColumn(targetCard.columnId);
+      card.moveTo(newPosition);
+
+      this.cardRepo.save(card);
+    } else if (targetColumnId) {
+      await this.columnAccess.ensureColumnInBoard(targetColumnId, boardId);
+
+      const pos = await this.cardOrderService.calculateAfterTop(targetColumnId);
+      const newPosition = new CardPosition(pos);
+
+      card.relocateToNewColumn(targetColumnId);
+      card.moveTo(newPosition);
+
+      this.cardRepo.save(card);
+    } else throw new ParamsInsufficientCardReorderError();
+  }
+}
