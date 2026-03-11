@@ -5,7 +5,7 @@ import { UserId } from "@domain/value-object/user-id.vo";
 import { ColumnNotInBoardError } from "@errors/column.error";
 import type { ColumnRepository } from "@interfaces/repo/column-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";
-import type { EventsOrchestrator } from "@services/event-basket.service";
+import type { EventsOrchestrator } from "@services/event-orchestrator.service";
 
 type RemoveColumnCommand = {
   columnId: string;

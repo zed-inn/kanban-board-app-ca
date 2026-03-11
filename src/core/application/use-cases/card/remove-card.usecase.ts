@@ -7,7 +7,7 @@ import { CardNotInColumnError } from "@errors/card.error";
 import type { CardRepository } from "@interfaces/repo/card-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";
 import type { ColumnAccessService } from "@services/column-access.service";
-import type { EventsOrchestrator } from "@services/event-basket.service";
+import type { EventsOrchestrator } from "@services/event-orchestrator.service";
 
 type RemoveCardCommand = {
   cardId: string;

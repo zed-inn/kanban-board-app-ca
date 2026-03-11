@@ -6,7 +6,7 @@ import { IsBoardOwnerError } from "@errors/board.error";
 import type { BoardRepository } from "@interfaces/repo/board-repository.interface";
 import type { MemberRepository } from "@interfaces/repo/member-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";
-import type { EventsOrchestrator } from "@services/event-basket.service";
+import type { EventsOrchestrator } from "@services/event-orchestrator.service";
 
 type RemoveMemberCommand = {
   boardId: string;

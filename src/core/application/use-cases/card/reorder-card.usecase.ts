@@ -10,7 +10,7 @@ import type { CardRepository } from "@interfaces/repo/card-repository.interface"
 import type { BoardAccessService } from "@services/board-access.service";
 import type { CardOrderingService } from "@services/card-ordering.service";
 import type { ColumnAccessService } from "@services/column-access.service";
-import type { EventsOrchestrator } from "@services/event-basket.service";
+import type { EventsOrchestrator } from "@services/event-orchestrator.service";
 
 export class ParamsInsufficientCardReorderError extends ApplicationError {
   readonly error = "invalid_action";

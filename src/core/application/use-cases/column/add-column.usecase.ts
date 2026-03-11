@@ -6,7 +6,7 @@ import type { ColumnRepository } from "@interfaces/repo/column-repository.interf
 import type { IdGenerator } from "@interfaces/utils/id-generator.interface";
 import type { BoardAccessService } from "@services/board-access.service";
 import type { ColumnOrderingService } from "@services/column-ordering.service";
-import type { EventsOrchestrator } from "@services/event-basket.service";
+import type { EventsOrchestrator } from "@services/event-orchestrator.service";
 
 type AddColumnCommand = {
   name: string;

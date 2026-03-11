@@ -4,7 +4,7 @@ import { BoardId } from "@domain/value-object/board-id.vo";
 import { UserId } from "@domain/value-object/user-id.vo";
 import type { BoardRepository } from "@interfaces/repo/board-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";
-import type { EventsOrchestrator } from "@services/event-basket.service";
+import type { EventsOrchestrator } from "@services/event-orchestrator.service";
 
 type RenameBoardCommand = {
   boardId: string;

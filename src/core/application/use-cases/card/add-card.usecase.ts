@@ -8,7 +8,7 @@ import { ColumnId } from "@domain/value-object/column-id.vo";
 import { BoardId } from "@domain/value-object/board-id.vo";
 import { UserId } from "@domain/value-object/user-id.vo";
 import { BaseEvent } from "@app/events/base.event";
-import type { EventsOrchestrator } from "@services/event-basket.service";
+import type { EventsOrchestrator } from "@services/event-orchestrator.service";
 
 type AddCardCommand = {
   title: string;

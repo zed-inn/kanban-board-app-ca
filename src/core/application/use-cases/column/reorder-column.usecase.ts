@@ -7,7 +7,7 @@ import { ColumnNotInBoardError } from "@errors/column.error";
 import type { ColumnRepository } from "@interfaces/repo/column-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";
 import type { ColumnOrderingService } from "@services/column-ordering.service";
-import type { EventsOrchestrator } from "@services/event-basket.service";
+import type { EventsOrchestrator } from "@services/event-orchestrator.service";
 
 type ReorderColumnCommand = {
   columnId: string;

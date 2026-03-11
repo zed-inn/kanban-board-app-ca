@@ -4,7 +4,7 @@ import { UserId } from "@domain/value-object/user-id.vo";
 import { NotBoardOwnerError } from "@errors/board.error";
 import type { BoardRepository } from "@interfaces/repo/board-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";
-import { EventsOrchestrator } from "@services/event-basket.service";
+import { EventsOrchestrator } from "@services/event-orchestrator.service";
 
 type ChangeOwnerCommand = {
   boardId: string;

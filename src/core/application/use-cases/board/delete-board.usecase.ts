@@ -5,7 +5,7 @@ import { NotBoardOwnerError } from "@errors/board.error";
 import type { BoardRepository } from "@interfaces/repo/board-repository.interface";
 import type { MemberRepository } from "@interfaces/repo/member-repository.interface";
 import type { UnitOfWork } from "@interfaces/utils/unit-of-work.interface";
-import type { EventsOrchestrator } from "@services/event-basket.service";
+import type { EventsOrchestrator } from "@services/event-orchestrator.service";
 
 type DeleteBoardCommand = {
   boardId: string;
