@@ -1,7 +1,7 @@
 import type { ColumnId } from "@domain/value-objects/column-id.vo";
 import type { KeysetPagination, PaginatedResult } from "./pagination";
 
-export interface CardModel {
+export interface CardReadModel {
   id: string;
   title: string;
   content: string | null;
@@ -15,5 +15,5 @@ export interface CardQuery {
   getByColumnId(
     columnId: ColumnId,
     pagination: KeysetPagination,
-  ): Promise<PaginatedResult<CardModel>>;
+  ): Promise<PaginatedResult<CardReadModel>>;
 }

@@ -1,7 +1,7 @@
 import type { BoardId } from "@domain/value-objects/board-id.vo";
 import type { KeysetPagination, PaginatedResult } from "./pagination";
 
-export interface ColumnModel {
+export interface ColumnReadModel {
   id: string;
   name: string;
   position: string;
@@ -14,5 +14,5 @@ export interface ColumnQuery {
   getByBoardId(
     boardId: BoardId,
     pagination: KeysetPagination,
-  ): Promise<PaginatedResult<ColumnModel>>;
+  ): Promise<PaginatedResult<ColumnReadModel>>;
 }

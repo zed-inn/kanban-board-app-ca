@@ -1,7 +1,7 @@
 import type { UserId } from "@domain/value-objects/user-id.vo";
 import type { KeysetPagination, PaginatedResult } from "./pagination";
 
-export interface BoardModel {
+export interface BoardReadModel {
   id: string;
   name: string;
   ownerId: string;
@@ -13,9 +13,9 @@ export interface BoardQuery {
   getByOwnerId(
     ownerId: UserId,
     pagination: KeysetPagination,
-  ): Promise<PaginatedResult<BoardModel>>;
+  ): Promise<PaginatedResult<BoardReadModel>>;
   getByMemberId(
     userId: UserId,
     pagination: KeysetPagination,
-  ): Promise<PaginatedResult<BoardModel>>;
+  ): Promise<PaginatedResult<BoardReadModel>>;
 }
