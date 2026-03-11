@@ -17,16 +17,44 @@ export {
   NoColumnError,
 } from "@errors/column.error";
 
-export { Board } from "@domain/entities/board";
-export { Column } from "@domain/entities/column";
-export { Card } from "@domain/entities/card";
+export { Board, BoardName } from "@domain/entities/board";
+export { Column, ColumnName, ColumnPosition } from "@domain/entities/column";
+export {
+  Card,
+  CardContent,
+  CardPosition,
+  CardTitle,
+} from "@domain/entities/card";
 export { BoardMembership } from "@domain/entities/board-membership";
 
-export type { EventTargetFactory } from "@interfaces/events/event-target-factory.interface";
+export { BoardId } from "@domain/value-objects/board-id.vo";
+export { ColumnId } from "@domain/value-objects/column-id.vo";
+export { CardId } from "@domain/value-objects/card-id.vo";
+export { UserId } from "@domain/value-objects/user-id.vo";
+
+export { BaseEvent } from "@app/events/base.event";
+
+export type {
+  KeysetPagination,
+  PaginatedResult,
+} from "@interfaces/queries/pagination";
+export type {
+  EventTargetFactory,
+  EventTarget,
+} from "@interfaces/events/event-target-factory.interface";
 export type { EventDispatcher } from "@interfaces/events/event-dispatcher.interface";
-export type { BoardQuery } from "@interfaces/queries/board-query.interface";
-export type { CardQuery } from "@interfaces/queries/card-query.interface";
-export type { ColumnQuery } from "@interfaces/queries/column-query.interface";
+export type {
+  BoardQuery,
+  BoardModel,
+} from "@interfaces/queries/board-query.interface";
+export type {
+  CardQuery,
+  CardModel,
+} from "@interfaces/queries/card-query.interface";
+export type {
+  ColumnQuery,
+  ColumnModel,
+} from "@interfaces/queries/column-query.interface";
 export type { BoardRepository } from "@interfaces/repo/board-repository.interface";
 export type { CardRepository } from "@interfaces/repo/card-repository.interface";
 export type { ColumnRepository } from "@interfaces/repo/column-repository.interface";

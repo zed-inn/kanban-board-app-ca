@@ -3,7 +3,6 @@ import type { KeysetPagination, PaginatedResult } from "./pagination";
 
 export interface CardModel {
   id: string;
-  name: string;
   title: string;
   content: string | null;
   position: string;

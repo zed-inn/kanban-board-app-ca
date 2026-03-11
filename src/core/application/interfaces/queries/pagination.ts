@@ -1,5 +1,5 @@
-export type KeysetPagination = {
-  cursor?: unknown;
+export type KeysetPagination<T extends unknown = unknown> = {
+  cursor?: T;
   limit: number;
 };
 
