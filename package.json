@@ -1,13 +1,13 @@
 {
   "name": "kanban",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "kanban board application component",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
     "clean": "rm -rf dist && rm -rf tsconfig.tsbuildinfo",
-    "build": "npm run clean && npx tsc -p tsconfig.json",
+    "build": "npm run clean && npx tsc -p tsconfig.json && npx tsc-alias",
     "start": "node dist/index.js",
     "dev": "nodemon"
   },
@@ -23,6 +23,7 @@
   "homepage": "https://github.com/zed-inn/kanban-board-app-ca#readme",
   "devDependencies": {
     "nodemon": "^3.1.13",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }

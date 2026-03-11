@@ -5,7 +5,9 @@
 
     "target": "ES2020",
     "module": "ES2020",
+    "moduleResolution": "node",
 
+    "sourceRoot": "./",
     "paths": {
       "@errors/*": [
         "./src/core/domain/errors/*",
@@ -20,6 +22,7 @@
       "@domain/*": ["./src/core/domain/*"],
       "@app/*": ["./src/core/application/*"]
     },
+    "esModuleInterop": true,
 
     "declaration": true,
     "declarationMap": true,
