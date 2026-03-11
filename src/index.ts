@@ -1,4 +1,22 @@
-export { ApplicationError } from "@domain/errors/application.error";
+export { ApplicationError } from "@errors/application.error";
+export {
+  IsBoardMemberError,
+  IsBoardOwnerError,
+  NoBoardError,
+  NotBoardMemberError,
+  NotBoardOwnerError,
+} from "@errors/board.error";
+export {
+  CardNotInColumnError,
+  InvalidCardPositionError,
+  NoCardError,
+} from "@errors/card.error";
+export {
+  ColumnNotInBoardError,
+  InvalidColumnPositionError,
+  NoColumnError,
+} from "@errors/column.error";
+
 export type { EventTargetFactory } from "@interfaces/events/event-target-factory.interface";
 export type { EventDispatcher } from "@interfaces/events/event-dispatcher.interface";
 export type { BoardQuery } from "@interfaces/queries/board-query.interface";
