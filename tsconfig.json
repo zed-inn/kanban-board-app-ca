@@ -16,6 +16,7 @@
         "./src/core/application/services/*"
       ],
       "@interfaces/*": ["./src/core/application/interfaces/*"],
+      "@usecases/*": ["./src/core/application/use-cases/*"],
       "@domain/*": ["./src/core/domain/*"],
       "@app/*": ["./src/core/application/*"]
     },
