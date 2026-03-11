@@ -1,4 +1,4 @@
-import type { UserId } from "@domain/value-object/user-id.vo";
+import type { UserId } from "@domain/value-objects/user-id.vo";
 import type { KeysetPagination, PaginatedResult } from "./pagination";
 
 export interface BoardModel extends Record<string, unknown> {}

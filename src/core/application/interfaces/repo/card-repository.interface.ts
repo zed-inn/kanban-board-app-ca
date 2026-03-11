@@ -1,6 +1,6 @@
 import type { Card, CardPosition } from "@domain/entities/card";
-import type { CardId } from "@domain/value-object/card-id.vo";
-import type { ColumnId } from "@domain/value-object/column-id.vo";
+import type { CardId } from "@domain/value-objects/card-id.vo";
+import type { ColumnId } from "@domain/value-objects/column-id.vo";
 
 export interface CardRepository {
   getById(id: CardId, ctx?: unknown): Promise<Card>;

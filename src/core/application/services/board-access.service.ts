@@ -1,6 +1,6 @@
 import { BoardMembership } from "@domain/entities/board-membership";
-import type { BoardId } from "@domain/value-object/board-id.vo";
-import type { UserId } from "@domain/value-object/user-id.vo";
+import type { BoardId } from "@domain/value-objects/board-id.vo";
+import type { UserId } from "@domain/value-objects/user-id.vo";
 import { NotBoardMemberError } from "@errors/board.error";
 import type { MemberRepository } from "@interfaces/repo/member-repository.interface";
 

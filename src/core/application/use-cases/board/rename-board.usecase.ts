@@ -1,7 +1,7 @@
 import { BaseEvent } from "@app/events/base.event";
 import { BoardName } from "@domain/entities/board";
-import { BoardId } from "@domain/value-object/board-id.vo";
-import { UserId } from "@domain/value-object/user-id.vo";
+import { BoardId } from "@domain/value-objects/board-id.vo";
+import { UserId } from "@domain/value-objects/user-id.vo";
 import type { BoardRepository } from "@interfaces/repo/board-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";
 import type { EventsOrchestrator } from "@services/event-orchestrator.service";

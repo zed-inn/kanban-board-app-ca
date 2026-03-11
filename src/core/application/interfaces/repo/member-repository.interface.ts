@@ -1,5 +1,5 @@
 import type { BoardMembership } from "@domain/entities/board-membership";
-import type { BoardId } from "@domain/value-object/board-id.vo";
+import type { BoardId } from "@domain/value-objects/board-id.vo";
 
 export interface MemberRepository {
   exists(membership: BoardMembership, ctx?: unknown): Promise<boolean>;

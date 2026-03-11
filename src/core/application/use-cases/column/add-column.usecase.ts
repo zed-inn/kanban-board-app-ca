@@ -1,7 +1,7 @@
 import { BaseEvent } from "@app/events/base.event";
 import { Column, ColumnName } from "@domain/entities/column";
-import { BoardId } from "@domain/value-object/board-id.vo";
-import { UserId } from "@domain/value-object/user-id.vo";
+import { BoardId } from "@domain/value-objects/board-id.vo";
+import { UserId } from "@domain/value-objects/user-id.vo";
 import type { ColumnRepository } from "@interfaces/repo/column-repository.interface";
 import type { IdGenerator } from "@interfaces/utils/id-generator.interface";
 import type { BoardAccessService } from "@services/board-access.service";

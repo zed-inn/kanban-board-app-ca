@@ -1,6 +1,6 @@
-import { VO } from "@domain/value-object/base.vo";
-import { BoardId } from "@domain/value-object/board-id.vo";
-import { UserId } from "@domain/value-object/user-id.vo";
+import { VO } from "@domain/value-objects/base.vo";
+import { BoardId } from "@domain/value-objects/board-id.vo";
+import { UserId } from "@domain/value-objects/user-id.vo";
 import { EntityValidationError } from "@errors/entity-validation.error";
 
 export class BoardName extends VO<string> {

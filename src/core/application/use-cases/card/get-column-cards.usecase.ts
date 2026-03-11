@@ -1,6 +1,6 @@
-import { BoardId } from "@domain/value-object/board-id.vo";
-import { ColumnId } from "@domain/value-object/column-id.vo";
-import { UserId } from "@domain/value-object/user-id.vo";
+import { BoardId } from "@domain/value-objects/board-id.vo";
+import { ColumnId } from "@domain/value-objects/column-id.vo";
+import { UserId } from "@domain/value-objects/user-id.vo";
 import type { CardQuery } from "@interfaces/queries/card-query.interface";
 import type { KeysetPagination } from "@interfaces/queries/pagination";
 import type { BoardAccessService } from "@services/board-access.service";

@@ -1,5 +1,5 @@
-import type { BoardId } from "@domain/value-object/board-id.vo";
-import type { UserId } from "@domain/value-object/user-id.vo";
+import type { BoardId } from "@domain/value-objects/board-id.vo";
+import type { UserId } from "@domain/value-objects/user-id.vo";
 
 export type EventTarget =
   | { type: "user"; id: UserId }

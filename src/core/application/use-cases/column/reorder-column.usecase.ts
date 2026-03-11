@@ -1,8 +1,8 @@
 import { BaseEvent } from "@app/events/base.event";
-import { ColumnPostion } from "@domain/entities/column";
-import { BoardId } from "@domain/value-object/board-id.vo";
-import { ColumnId } from "@domain/value-object/column-id.vo";
-import { UserId } from "@domain/value-object/user-id.vo";
+import { ColumnPosition } from "@domain/entities/column";
+import { BoardId } from "@domain/value-objects/board-id.vo";
+import { ColumnId } from "@domain/value-objects/column-id.vo";
+import { UserId } from "@domain/value-objects/user-id.vo";
 import { ColumnNotInBoardError } from "@errors/column.error";
 import type { ColumnRepository } from "@interfaces/repo/column-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";
@@ -49,7 +49,7 @@ export class ReorderColumn {
     const pos = targetColumn.position.isAfter(column.position)
       ? await this.columnOrderingService.calculateBeforeColumn(targetColumn)
       : await this.columnOrderingService.calculateAfterColumn(targetColumn);
-    const newPosition = new ColumnPostion(pos);
+    const newPosition = new ColumnPosition(pos);
 
     column.moveTo(newPosition);
 
@@ -70,7 +70,7 @@ export class ReorderColumn {
 
 export class ColumnReorderedEvent extends BaseEvent<{
   columnId: ColumnId;
-  newPosition: ColumnPostion;
+  newPosition: ColumnPosition;
 }> {
   protected override _name: string = "COLUMN_REORDERED";
 }

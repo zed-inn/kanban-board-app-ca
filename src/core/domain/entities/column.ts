@@ -1,8 +1,8 @@
 import { EntityValidationError } from "@errors/entity-validation.error";
-import { BoardId } from "@domain/value-object/board-id.vo";
-import { ColumnId } from "@domain/value-object/column-id.vo";
-import { Position } from "@domain/value-object/position.vo";
-import { VO } from "@domain/value-object/base.vo";
+import { BoardId } from "@domain/value-objects/board-id.vo";
+import { ColumnId } from "@domain/value-objects/column-id.vo";
+import { Position } from "@domain/value-objects/position.vo";
+import { VO } from "@domain/value-objects/base.vo";
 
 export class ColumnName extends VO<string> {
   protected readonly __type!: "ColumnName";
@@ -24,7 +24,7 @@ export class ColumnName extends VO<string> {
   }
 }
 
-export class ColumnPostion extends Position<"ColumnPosition"> {
+export class ColumnPosition extends Position<"ColumnPosition"> {
   constructor(pos: string) {
     if (typeof pos !== "string")
       throw new EntityValidationError(
@@ -43,7 +43,7 @@ export class ColumnPostion extends Position<"ColumnPosition"> {
 export class Column {
   private readonly _id: ColumnId;
   private _name: ColumnName;
-  private _position: ColumnPostion;
+  private _position: ColumnPosition;
   private _boardId: BoardId;
 
   constructor(params: {
@@ -54,7 +54,7 @@ export class Column {
   }) {
     this._id = new ColumnId(params.id);
     this._name = new ColumnName(params.name);
-    this._position = new ColumnPostion(params.position);
+    this._position = new ColumnPosition(params.position);
     this._boardId = new BoardId(params.boardId);
   }
 
@@ -75,7 +75,7 @@ export class Column {
     this._name = newName;
   }
 
-  moveTo(newPosition: ColumnPostion) {
+  moveTo(newPosition: ColumnPosition) {
     this._position = newPosition;
   }
 }

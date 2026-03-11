@@ -1,5 +1,5 @@
 import type { Board } from "@domain/entities/board";
-import type { BoardId } from "@domain/value-object/board-id.vo";
+import type { BoardId } from "@domain/value-objects/board-id.vo";
 
 export interface BoardRepository {
   getById(id: BoardId, ctx?: unknown): Promise<Board>;

@@ -1,8 +1,8 @@
 import { EntityValidationError } from "@errors/entity-validation.error";
-import { CardId } from "@domain/value-object/card-id.vo";
-import { ColumnId } from "@domain/value-object/column-id.vo";
-import { Position } from "@domain/value-object/position.vo";
-import { VO } from "@domain/value-object/base.vo";
+import { CardId } from "@domain/value-objects/card-id.vo";
+import { ColumnId } from "@domain/value-objects/column-id.vo";
+import { Position } from "@domain/value-objects/position.vo";
+import { VO } from "@domain/value-objects/base.vo";
 
 export class CardTitle extends VO<string> {
   protected readonly __type!: "CardTitle";

@@ -1,6 +1,6 @@
 import { Board, BoardName } from "@domain/entities/board";
 import { BoardMembership } from "@domain/entities/board-membership";
-import { UserId } from "@domain/value-object/user-id.vo";
+import { UserId } from "@domain/value-objects/user-id.vo";
 import type { BoardRepository } from "@interfaces/repo/board-repository.interface";
 import type { MemberRepository } from "@interfaces/repo/member-repository.interface";
 import type { IdGenerator } from "@interfaces/utils/id-generator.interface";

@@ -1,5 +1,5 @@
 import type { Card } from "@domain/entities/card";
-import type { ColumnId } from "@domain/value-object/column-id.vo";
+import type { ColumnId } from "@domain/value-objects/column-id.vo";
 import type { CardRepository } from "@interfaces/repo/card-repository.interface";
 import { LexoRank } from "@services/lexorank.service";
 

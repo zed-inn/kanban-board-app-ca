@@ -1,4 +1,4 @@
-import { UserId } from "@domain/value-object/user-id.vo";
+import { UserId } from "@domain/value-objects/user-id.vo";
 import type { BoardQuery } from "@interfaces/queries/board-query.interface";
 import type { KeysetPagination } from "@interfaces/queries/pagination";
 

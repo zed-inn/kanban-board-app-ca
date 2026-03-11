@@ -4,9 +4,9 @@ import type { IdGenerator } from "../../interfaces/utils/id-generator.interface"
 import type { BoardAccessService } from "../../services/board-access.service";
 import type { CardOrderingService } from "../../services/card-ordering.service";
 import type { ColumnAccessService } from "@services/column-access.service";
-import { ColumnId } from "@domain/value-object/column-id.vo";
-import { BoardId } from "@domain/value-object/board-id.vo";
-import { UserId } from "@domain/value-object/user-id.vo";
+import { ColumnId } from "@domain/value-objects/column-id.vo";
+import { BoardId } from "@domain/value-objects/board-id.vo";
+import { UserId } from "@domain/value-objects/user-id.vo";
 import { BaseEvent } from "@app/events/base.event";
 import type { EventsOrchestrator } from "@services/event-orchestrator.service";
 

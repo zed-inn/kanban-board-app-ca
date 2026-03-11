@@ -1,5 +1,5 @@
 import type { Column } from "@domain/entities/column";
-import type { BoardId } from "@domain/value-object/board-id.vo";
+import type { BoardId } from "@domain/value-objects/board-id.vo";
 import type { ColumnRepository } from "@interfaces/repo/column-repository.interface";
 import { LexoRank } from "@services/lexorank.service";
 

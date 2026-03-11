@@ -1,5 +1,5 @@
-import { BoardId } from "@domain/value-object/board-id.vo";
-import { UserId } from "@domain/value-object/user-id.vo";
+import { BoardId } from "@domain/value-objects/board-id.vo";
+import { UserId } from "@domain/value-objects/user-id.vo";
 
 export class BoardMembership {
   private readonly _boardId: BoardId;

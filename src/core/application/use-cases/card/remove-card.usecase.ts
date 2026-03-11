@@ -1,8 +1,8 @@
 import { BaseEvent } from "@app/events/base.event";
-import { BoardId } from "@domain/value-object/board-id.vo";
-import { CardId } from "@domain/value-object/card-id.vo";
-import { ColumnId } from "@domain/value-object/column-id.vo";
-import { UserId } from "@domain/value-object/user-id.vo";
+import { BoardId } from "@domain/value-objects/board-id.vo";
+import { CardId } from "@domain/value-objects/card-id.vo";
+import { ColumnId } from "@domain/value-objects/column-id.vo";
+import { UserId } from "@domain/value-objects/user-id.vo";
 import { CardNotInColumnError } from "@errors/card.error";
 import type { CardRepository } from "@interfaces/repo/card-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";

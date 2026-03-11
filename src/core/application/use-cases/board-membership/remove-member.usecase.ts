@@ -1,7 +1,7 @@
 import { BaseEvent } from "@app/events/base.event";
 import { BoardMembership } from "@domain/entities/board-membership";
-import { BoardId } from "@domain/value-object/board-id.vo";
-import { UserId } from "@domain/value-object/user-id.vo";
+import { BoardId } from "@domain/value-objects/board-id.vo";
+import { UserId } from "@domain/value-objects/user-id.vo";
 import { IsBoardOwnerError } from "@errors/board.error";
 import type { BoardRepository } from "@interfaces/repo/board-repository.interface";
 import type { MemberRepository } from "@interfaces/repo/member-repository.interface";
