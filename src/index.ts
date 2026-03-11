@@ -45,15 +45,15 @@ export type {
 export type { EventDispatcher } from "@interfaces/events/event-dispatcher.interface";
 export type {
   BoardQuery,
-  BoardModel,
+  BoardReadModel,
 } from "@interfaces/queries/board-query.interface";
 export type {
   CardQuery,
-  CardModel,
+  CardReadModel,
 } from "@interfaces/queries/card-query.interface";
 export type {
   ColumnQuery,
-  ColumnModel,
+  ColumnReadModel,
 } from "@interfaces/queries/column-query.interface";
 export type { BoardRepository } from "@interfaces/repo/board-repository.interface";
 export type { CardRepository } from "@interfaces/repo/card-repository.interface";
