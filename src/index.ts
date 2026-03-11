@@ -17,6 +17,11 @@ export {
   NoColumnError,
 } from "@errors/column.error";
 
+export { Board } from "@domain/entities/board";
+export { Column } from "@domain/entities/column";
+export { Card } from "@domain/entities/card";
+export { BoardMembership } from "@domain/entities/board-membership";
+
 export type { EventTargetFactory } from "@interfaces/events/event-target-factory.interface";
 export type { EventDispatcher } from "@interfaces/events/event-dispatcher.interface";
 export type { BoardQuery } from "@interfaces/queries/board-query.interface";
