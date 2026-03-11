@@ -1,3 +1,4 @@
+import { BaseEvent } from "@app/events/base.event";
 import { CardContent, CardTitle } from "@domain/entities/card";
 import { BoardId } from "@domain/value-object/board-id.vo";
 import { CardId } from "@domain/value-object/card-id.vo";
@@ -8,6 +9,7 @@ import { CardNotInColumnError } from "@errors/card.error";
 import type { CardRepository } from "@interfaces/repo/card-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";
 import type { ColumnAccessService } from "@services/column-access.service";
+import type { EventsOrchestrator } from "@services/event-basket.service";
 
 export class ParamsInsufficientCardBodyUpdateError extends ApplicationError {
   readonly error = "invalid_action";
@@ -31,6 +33,7 @@ export class UpdateCardBody {
     private cardRepo: CardRepository,
     private boardAccess: BoardAccessService,
     private columnAccess: ColumnAccessService,
+    private eventsOrchestra: EventsOrchestrator,
   ) {}
 
   private serialize(cmd: UpdateCardBodyCommand) {
@@ -49,6 +52,7 @@ export class UpdateCardBody {
   async execute(cmd: UpdateCardBodyCommand) {
     const { boardId, cardId, columnId, memberId, content, title } =
       this.serialize(cmd);
+    const events = this.eventsOrchestra.createNewBasket();
 
     await this.boardAccess.ensureMember(memberId, boardId);
     await this.columnAccess.ensureColumnInBoard(columnId, boardId);
@@ -65,5 +69,23 @@ export class UpdateCardBody {
     card.updateBody(body);
 
     await this.cardRepo.save(card);
+
+    events.push(
+      new CardBodyUpdatedEvent({
+        target: this.eventsOrchestra.createTarget.viaBoardIdExcluding(boardId, [
+          memberId,
+        ]),
+        data: { cardId, newBody: { title: card.title, content: card.content } },
+      }),
+    );
+
+    await this.eventsOrchestra.drainBasket(events);
   }
+}
+
+export class CardBodyUpdatedEvent extends BaseEvent<{
+  cardId: CardId;
+  newBody: { title: CardTitle; content: CardContent };
+}> {
+  protected override _name: string = "CARD_BODY_UPDATED";
 }

@@ -1,3 +1,4 @@
+import { BaseEvent } from "@app/events/base.event";
 import { ColumnPostion } from "@domain/entities/column";
 import { BoardId } from "@domain/value-object/board-id.vo";
 import { ColumnId } from "@domain/value-object/column-id.vo";
@@ -6,6 +7,7 @@ import { ColumnNotInBoardError } from "@errors/column.error";
 import type { ColumnRepository } from "@interfaces/repo/column-repository.interface";
 import type { BoardAccessService } from "@services/board-access.service";
 import type { ColumnOrderingService } from "@services/column-ordering.service";
+import type { EventsOrchestrator } from "@services/event-basket.service";
 
 type ReorderColumnCommand = {
   columnId: string;
@@ -19,6 +21,7 @@ export class ReorderColumn {
     private columnRepo: ColumnRepository,
     private boardAccess: BoardAccessService,
     private columnOrderingService: ColumnOrderingService,
+    private eventsOrchestra: EventsOrchestrator,
   ) {}
 
   private serialize(cmd: ReorderColumnCommand) {
@@ -32,6 +35,7 @@ export class ReorderColumn {
 
   async execute(cmd: ReorderColumnCommand) {
     const { boardId, columnId, memberId, targetColumnId } = this.serialize(cmd);
+    const events = this.eventsOrchestra.createNewBasket();
 
     await this.boardAccess.ensureMember(memberId, boardId);
 
@@ -50,5 +54,23 @@ export class ReorderColumn {
     column.moveTo(newPosition);
 
     await this.columnRepo.save(column);
+
+    events.push(
+      new ColumnReorderedEvent({
+        target: this.eventsOrchestra.createTarget.viaBoardIdExcluding(boardId, [
+          memberId,
+        ]),
+        data: { columnId, newPosition },
+      }),
+    );
+
+    await this.eventsOrchestra.drainBasket(events);
   }
+}
+
+export class ColumnReorderedEvent extends BaseEvent<{
+  columnId: ColumnId;
+  newPosition: ColumnPostion;
+}> {
+  protected override _name: string = "COLUMN_REORDERED";
 }

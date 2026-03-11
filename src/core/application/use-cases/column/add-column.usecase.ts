@@ -1,3 +1,4 @@
+import { BaseEvent } from "@app/events/base.event";
 import { Column, ColumnName } from "@domain/entities/column";
 import { BoardId } from "@domain/value-object/board-id.vo";
 import { UserId } from "@domain/value-object/user-id.vo";
@@ -5,6 +6,7 @@ import type { ColumnRepository } from "@interfaces/repo/column-repository.interf
 import type { IdGenerator } from "@interfaces/utils/id-generator.interface";
 import type { BoardAccessService } from "@services/board-access.service";
 import type { ColumnOrderingService } from "@services/column-ordering.service";
+import type { EventsOrchestrator } from "@services/event-basket.service";
 
 type AddColumnCommand = {
   name: string;
@@ -18,6 +20,7 @@ export class AddColumn {
     private columnRepo: ColumnRepository,
     private boardAccess: BoardAccessService,
     private columnOrderingService: ColumnOrderingService,
+    private eventsOrchestra: EventsOrchestrator,
   ) {}
 
   private serialize(cmd: AddColumnCommand) {
@@ -30,6 +33,7 @@ export class AddColumn {
 
   async execute(cmd: AddColumnCommand) {
     const { boardId, memberId, name } = this.serialize(cmd);
+    const events = this.eventsOrchestra.createNewBasket();
 
     await this.boardAccess.ensureMember(memberId, boardId);
 
@@ -44,5 +48,20 @@ export class AddColumn {
       position,
     });
     await this.columnRepo.save(column);
+
+    events.push(
+      new NewColumnAddedEvent({
+        target: this.eventsOrchestra.createTarget.viaBoardIdExcluding(boardId, [
+          memberId,
+        ]),
+        data: { column },
+      }),
+    );
+
+    await this.eventsOrchestra.drainBasket(events);
   }
+}
+
+export class NewColumnAddedEvent extends BaseEvent<{ column: Column }> {
+  protected override _name: string = "NEW_COLUMN_ADDED";
 }

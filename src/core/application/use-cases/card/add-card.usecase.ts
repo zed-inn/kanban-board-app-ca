@@ -7,6 +7,8 @@ import type { ColumnAccessService } from "@services/column-access.service";
 import { ColumnId } from "@domain/value-object/column-id.vo";
 import { BoardId } from "@domain/value-object/board-id.vo";
 import { UserId } from "@domain/value-object/user-id.vo";
+import { BaseEvent } from "@app/events/base.event";
+import type { EventsOrchestrator } from "@services/event-basket.service";
 
 type AddCardCommand = {
   title: string;
@@ -23,6 +25,7 @@ export class AddCard {
     private boardAccess: BoardAccessService,
     private columnAccess: ColumnAccessService,
     private cardOrderingService: CardOrderingService,
+    private eventsOrchestra: EventsOrchestrator,
   ) {}
 
   private serialize(cmd: AddCardCommand) {
@@ -37,6 +40,7 @@ export class AddCard {
 
   async execute(cmd: AddCardCommand) {
     const { boardId, columnId, content, memberId, title } = this.serialize(cmd);
+    const events = this.eventsOrchestra.createNewBasket();
 
     await this.boardAccess.ensureMember(memberId, boardId);
     await this.columnAccess.ensureColumnInBoard(columnId, boardId);
@@ -52,5 +56,20 @@ export class AddCard {
       columnId: columnId.v,
     });
     await this.cardRepo.save(card);
+
+    events.push(
+      new NewCardAddedEvent({
+        target: this.eventsOrchestra.createTarget.viaBoardIdExcluding(boardId, [
+          memberId,
+        ]),
+        data: { card },
+      }),
+    );
+
+    await this.eventsOrchestra.drainBasket(events);
   }
+}
+
+export class NewCardAddedEvent extends BaseEvent<{ card: Card }> {
+  protected override _name: string = "NEW_CARD_ADDED";
 }
