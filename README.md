@@ -1,224 +1,62 @@
-# Kanban Board Application
+# Kanban Core: Pure Domain Engine
 
-## Entities :
+This package contains the strictly bounded, framework-agnostic application core of the Kanban system. It is a pure state machine.
 
-- User
-  - Contains private `_id`
-  - Has no methods
+There are no database drivers here. There are no HTTP frameworks. There is no `pg`, no `fastify`, and no ORM. This layer dictates the business logic, defines the contracts, and forces the infrastructure layer to do the dirty work.
 
-- Board
-  - Contains private `_id`, `name`, `ownerId`
-  - Has methods `rename`, `transferOwnershipTo`
+## Folder Structure
 
-- Board Membership
-  - Contains private `boardId`, `memberId`
-  - Has no methods
-
-- Column
-  - Contains private `_id`, `name`, `position`, `boardId`
-  - Has methods `rename`, `moveTo`
-
-- Card
-  - Contains private `_id`, `title`, `content`, `position`, `columnId`
-  - Has methods `updateBody`, `moveTo`, `relocateToNewColumn`
-
-## Use cases
-
-### Board
-
-- Create Board
-- Delete Board
-- Change Owner
-- Rename Board
-
-### Board Membership
-
-- Add Member
-- Remove Member
-
-### Column
-
-- Add Column
-- Remove Column
-- Rename Column
-- Reorder Column
-
-### Card
-
-- Add Card
-- Remove Card
-- Update Card Body
-- Reorder Card
-
-## Interfaces / Ports
-
-### Constants
-
-- Column Constant
-
-```ts
-export interface ColumnConstants {
-  POSITION_GAP: number;
-}
+```
+src/
+├── core/
+│   ├── domain/               # Enterprise Business Rules (Entities, Value Objects)
+│   │   ├── entities/         # Board, Column, Card, BoardMembership
+│   │   ├── errors/           # Pure domain exceptions
+│   │   ├── services/         # Pure algorithmic services (LexoRank)
+│   │   └── value-objects/    # Strict validation wrappers (CardTitle, ColumnId)
+│   └── application/          # Application Business Rules (Use Cases)
+│       ├── errors/           # Use-case specific errors (NotBoardOwnerError)
+│       ├── events/           # Domain event definitions
+│       ├── interfaces/       # Contracts for the Infrastructure to implement
+│       │   ├── events/       # EventDispatcher, EventTargetFactory
+│       │   ├── queries/      # CQRS Read Models (BoardQuery, CardQuery)
+│       │   ├── repo/         # Write Models (BoardRepository, CardRepository)
+│       │   └── utils/        # UnitOfWork, IdGenerator
+│       ├── services/         # Orchestration (BoardAccessService, EventOrchestrator)
+│       └── use-cases/        # 18 isolated, single-responsibility action classes
+└── index.ts                  # The Composition Root exporting the `Kanban` Facade
 ```
 
-- Card Constant
+## Architectural Highlights
 
-```ts
-export interface CardConstant {
-  POSITION_GAP: number;
-}
-```
+### 1. Violent Decoupling (Clean Architecture)
 
-### Repository
+The domain dictates the requirements. The infrastructure merely fulfills them.
 
-- Board Repository
+**Repositories** only accept and return pure Domain Entities for state mutations.
 
-```ts
-interface BoardRepository {
-  getByOwnerId(userId: string): Promise<Board[]>;
-  getByIds(ids: string[]): Promise<Board[]>;
-  getById(id: string): Promise<Board>;
-  save(board: Board): Promise<void>;
-  remove(board: Board): Promise<void>;
-}
-```
+**Queries (CQRS)** bypass entities entirely, defining strict read-only contracts (`CardReadModel`) to guarantee type safety without polluting the domain with database metadata.
 
-- Member Repository
+**The Facade Pattern**: The entire domain is encapsulated in a single `Kanban` class. The infrastructure instantiates this class once and calls its Use Cases.
 
-```ts
-interface MemberRepository {
-  exists(membership: BoardMembership): Promise<boolean>;
-  getByUserId(userId: string): Promise<BoardMembership[]>;
-  getAllBoardMemberIdsById(boardId: string): Promise<string[]>;
-  removeAllBoardMembers(board: Board): Promise<void>;
-  remove(membership: BoardMembership): Promise<void>;
-  save(membership: BoardMembership): Promise<void>;
-}
-```
+### 2. _O(1)_ Distributed Sorting (LexoRank)
 
-- Column Repository
+Standard drag-and-drop systems use integer arrays, meaning moving a card from position `0` to `1` requires updating the index of every other card in the database ($O(N)$).
+To prevent cascading database locks, this engine implements **LexoRank** (string-based lexicographical sorting). Reordering a card simply calculates the midpoint string between two existing cards. Database writes are permanently _O(1)_.
 
-```ts
-interface ColumnRepository {
-  getByBoardId(boardId: string): Promise<Column[]>;
-  getById(id: string): Promise<Column>;
-  getTopInBoard(boardId: string): Promise<Column | null>;
-  getTopColumnBelowPositionInBoard(
-    position: number,
-    boardId: string,
-  ): Promise<Column | null>;
-  getBottomColumnAbovePositionInBoard(
-    position: number,
-    boardId: string,
-  ): Promise<Column | null>;
-  remove(column: Column): Promise<void>;
-  save(column: Column): Promise<void>;
-}
-```
+### 3. Framework-Agnostic Atomicity (Opaque Token UoW)
 
-- Card Repository
+Race conditions corrupt data. To wrap multi-repository operations (like creating a board and assigning the owner) in ACID transactions without leaking SQL into the domain, this system uses an **Opaque Token Unit of Work**. The core passes a `ctx?: unknown` token through the Use Cases. It doesn't know what it is; it just blindly carries the Postgres connection pool from the UoW to the Repositories.
 
-```ts
-interface CardRepository {
-  getByColumnId(columnId: string): Promise<Card[]>;
-  getById(id: string): Promise<Card>;
-  getTopInColumn(columnId: string): Promise<Card | null>;
-  getTopCardBelowPositionInColumn(
-    position: number,
-    columnId: string,
-  ): Promise<Card | null>;
-  getBottomCardAbovePositionInColumn(
-    position: number,
-    columnId: string,
-  ): Promise<Card | null>;
-  remove(card: Card): Promise<void>;
-  save(card: Card): Promise<void>;
-}
-```
+### 4. Phantom-Free Event Orchestration
 
-### Policy
+Emitting real-time WebSocket events before a database transaction commits leads to phantom state (clients see data that rolled back).
+We use an **Event Basket**. Domain events are pushed to an in-memory queue during the Use Case execution. The orchestrator only drains the basket and dispatches to the infrastructure after the Use Case successfully terminates.
 
-- Member Policy
+## Current Limitations & Tradeoffs
 
-```ts
-interface MemberPolicy {
-  ensureOwner(boardId: string, ownerId: string): Promise<void>;
-  ensureMember(memberId: string, boardId: string): Promise<void>;
-}
-```
+**LexoRank String Degradation**: Because LexoRank constantly halves the distance between strings, heavily reordered lists will result in increasingly long string values. There is currently no `RebalanceRankJob` implemented to reset the strings to standard intervals when they get too long.
 
-- Column Policy
+**The Value Object Tax**: Aggressive defensive programming (instantiating `CardTitle`, `CardPosition`, etc., for every mutation) ensures pristine data but creates high garbage collection overhead for bulk inserts.
 
-```ts
-interface ColumnPolicy {
-  ensureColumnInBoard(columnId: string, boardId: string): Promise<void>;
-  ensureEmptyPositionInBoard(position: number, boardId: string): Promise<void>;
-}
-```
-
-- Card Policy
-
-```ts
-interface CardPolicy {
-  ensureEmptyPositionInColumn(
-    position: number,
-    columnId: string,
-  ): Promise<void>;
-  ensureCardInColumn(id: string, columnId: string): Promise<void>;
-}
-```
-
-### Utils
-
-- Unit Of Work
-
-```ts
-interface UnitOfWork {
-  atomic<T>(work: () => Promise<T>): Promise<T>;
-}
-```
-
-- Id Generator
-
-```ts
-export interface IdGenerator {
-  generateUnique(): Promise<string>;
-}
-```
-
-### Emitter
-
-There is only one emitter that depends on `Event` object defined in the same file.
-Most of the events are supposed to be Fire-and-forget thing.
-Events emitted by Use cases are defined in the usecases themselves in the function definitions.
-(Function definition are undergoing...)
-
-## How to use ?
-
-The module exports all the interface and usecases class which can be imported in the infra.
-
-Each interface can be implemented in desired way. \
-For each use case, a new instance of that use case and new instances of all the interface required in necessary for desired results. \
-
-for ex.
-
-```ts
-const idGenerator = new UUIDGenerator();
-const memberRepo = new PostgresBoardMemberRepository(db, {});
-const cardRepo = new PostgresCardRepository(db, {});
-const memberPolicy = new PostgresBoardMemberPolicy(db);
-const columnPolicy = new PostgresColumnPolicy(db);
-const eventEmitter = new IoEventEmitter(io);
-
-const addCard = new AddCard(
-  idGenerator,
-  cardRepo,
-  memberRepo,
-  cardRepo,
-  memberPolicy,
-  columnPolicy,
-  eventEmitter,
-);
-await addCard.execute(b.title, b.content, p.columnId, p.boardId, user.id);
-```
+**No "Join Room" Use Case**: The event target factory handles routing, but the core currently lacks a dedicated use case to handle explicit real-time presence/room synchronization.
